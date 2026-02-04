@@ -8,7 +8,16 @@ import time
 from pathlib import Path
 
 from models import init_db, save_job
-from scrapers import scrape_greenhouse, scrape_lever, scrape_workable, scrape_ashby, scrape_smartrecruiters
+from scrapers import (
+    scrape_greenhouse,
+    scrape_lever,
+    scrape_workable,
+    scrape_ashby,
+    scrape_smartrecruiters,
+    scrape_amazon,
+    scrape_telefonica,
+    scrape_microsoft_email,
+)
 
 # Setup logging
 logging.basicConfig(
@@ -46,13 +55,17 @@ def scrape_company(company: dict) -> int:
     ats_platform = company.get('ats_platform', 'custom')
     ats_id = company.get('ats_id', '')
 
-    if not ats_id:
+    # Custom scrapers that don't need ats_id
+    if ats_platform == 'amazon':
+        jobs = scrape_amazon(company_id)
+    elif ats_platform == 'telefonica':
+        jobs = scrape_telefonica(company_id)
+    elif ats_platform == 'microsoft_email':
+        jobs = scrape_microsoft_email(company_id)
+    elif not ats_id:
         logger.warning(f"No ATS ID configured for {company_id}, skipping")
         return 0
-
-    jobs = []
-
-    if ats_platform == 'greenhouse':
+    elif ats_platform == 'greenhouse':
         jobs = scrape_greenhouse(company_id, ats_id)
     elif ats_platform == 'lever':
         jobs = scrape_lever(company_id, ats_id)

@@ -246,15 +246,15 @@
       "headquarters": "Seattle",
       "website": "https://amazon.com",
       "careers_url": "https://www.amazon.jobs/en/locations/barcelona-spain",
-      "ats_platform": "custom",
-      "ats_id": "",
+      "ats_platform": "amazon",
+      "ats_id": "barcelona",
       "industry": "E-commerce / Cloud / Tech",
       "employee_count": "1000000+",
       "ethics_rating": "kinda_evil",
       "ethics_notes": "Labor practices concerns, warehouse conditions, market dominance",
       "languages": ["English"],
       "known_visa_sponsor": true,
-      "notes": "Massive DS hiring, established visa process. Barcelona office includes AWS and retail teams. Uses custom ATS - needs custom parser."
+      "notes": "Massive DS hiring, established visa process. Barcelona office includes AWS and retail teams."
     },
     {
       "id": "microsoft",
@@ -262,31 +262,31 @@
       "headquarters": "Redmond",
       "website": "https://microsoft.com",
       "careers_url": "https://careers.microsoft.com/",
-      "ats_platform": "custom",
-      "ats_id": "",
+      "ats_platform": "microsoft_email",
+      "ats_id": "email",
       "industry": "Software / Cloud / AI",
       "employee_count": "200000+",
       "ethics_rating": "neutral",
       "ethics_notes": "Mixed record on privacy, strong on accessibility",
       "languages": ["English"],
       "known_visa_sponsor": true,
-      "notes": "Multinational infrastructure, established visa sponsorship. Barcelona office. Uses custom ATS - needs custom parser."
+      "notes": "Multinational infrastructure, established visa sponsorship. Barcelona office. Jobs scraped via email alerts."
     },
     {
       "id": "telefonica",
       "name": "Telefónica",
       "headquarters": "Madrid",
       "website": "https://telefonica.com",
-      "careers_url": "https://www.telefonica.com/en/talent/job-offers/",
-      "ats_platform": "custom",
-      "ats_id": "",
+      "careers_url": "https://jobs.telefonica.com/search/?locationsearch=barcelona",
+      "ats_platform": "telefonica",
+      "ats_id": "barcelona",
       "industry": "Telecommunications",
       "employee_count": "100000+",
       "ethics_rating": "neutral",
       "ethics_notes": "Major Spanish telecom, data privacy considerations",
       "languages": ["Spanish", "English"],
       "known_visa_sponsor": true,
-      "notes": "Spanish giant, explicitly sponsors visas. Strong presence in Barcelona. Uses custom ATS - needs custom parser."
+      "notes": "Spanish giant, explicitly sponsors visas. Strong presence in Barcelona."
     }
   ]
 }
