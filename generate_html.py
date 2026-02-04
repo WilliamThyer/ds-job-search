@@ -108,7 +108,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="filters">
         <strong>Filter:</strong>
         <label><input type="checkbox" id="filter-visa" checked> Visa-friendly</label>
-        <label><input type="checkbox" id="filter-good" checked> Good ethics</label>
     </div>
 
     <div id="jobs">
@@ -122,17 +121,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         function filterJobs() {{
             const visaOnly = document.getElementById('filter-visa').checked;
-            const goodOnly = document.getElementById('filter-good').checked;
 
             document.querySelectorAll('.job-card').forEach(card => {{
                 const hasVisa = card.dataset.visa !== 'unknown';
-                const isGood = card.dataset.ethics === 'good';
-
-                let show = true;
-                if (visaOnly && !hasVisa) show = false;
-                if (goodOnly && !isGood) show = false;
-
-                card.style.display = show ? 'block' : 'none';
+                card.style.display = (visaOnly && !hasVisa) ? 'none' : 'block';
             }});
         }}
     </script>
@@ -179,12 +171,22 @@ def generate_html():
     jobs = get_all_jobs()
     companies = load_company_info()
 
+    def is_barcelona(job):
+        location = (job['location'] or '').lower()
+        return 'barcelona' in location or 'spain' in location or 'bcn' in location
+
+    barcelona_jobs = [j for j in jobs if is_barcelona(j)]
     today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-    new_today = sum(1 for j in jobs if j['scraped_date'][:10] == today)
-    unique_companies = len(set(j['company_id'] for j in jobs))
+    new_today = sum(1 for j in barcelona_jobs if j['scraped_date'][:10] == today)
+    unique_companies = len(set(j['company_id'] for j in barcelona_jobs))
 
     jobs_html = []
     for job in jobs:
+        # Filter to Barcelona-only jobs
+        location = (job['location'] or '').lower()
+        if 'barcelona' not in location and 'spain' not in location and 'bcn' not in location:
+            continue
+
         company_info = companies.get(job['company_id'], {})
         company_sponsors = company_info.get('known_visa_sponsor', False)
 
@@ -228,7 +230,7 @@ def generate_html():
 
     html = HTML_TEMPLATE.format(
         updated=datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
-        total_jobs=len(jobs),
+        total_jobs=len(jobs_html),
         new_today=new_today,
         companies=unique_companies,
         jobs_html='\n'.join(jobs_html),
@@ -236,8 +238,8 @@ def generate_html():
 
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_FILE.write_text(html)
-    print(f"Generated {OUTPUT_FILE} with {len(jobs)} jobs")
-    return len(jobs), new_today
+    print(f"Generated {OUTPUT_FILE} with {len(jobs_html)} Barcelona jobs")
+    return len(jobs_html), new_today
 
 
 if __name__ == "__main__":
