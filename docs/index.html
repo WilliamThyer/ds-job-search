@@ -117,6 +117,44 @@
             font-size: 11px;
             margin-left: 8px;
         }
+        .manual-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+        .manual-section h2 {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .manual-sites {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .manual-site {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #6c757d;
+        }
+        .manual-site h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }
+        .manual-site h3 a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .manual-site h3 a:hover {
+            text-decoration: underline;
+        }
+        .manual-site p {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+        }
         @media (max-width: 600px) {
             .filter-row { flex-direction: column; align-items: stretch; }
             .filter-group { width: 100%; }
@@ -127,19 +165,19 @@
 </head>
 <body>
     <h1>Barcelona Data Science Jobs</h1>
-    <p class="updated">Last updated: 2026-02-04 23:13 UTC</p>
+    <p class="updated">Last updated: 2026-02-04 23:46 UTC</p>
 
     <div class="stats">
         <div class="stat">
-            <div class="stat-number">66</div>
+            <div class="stat-number">75</div>
             <div class="stat-label">Total Jobs</div>
         </div>
         <div class="stat">
-            <div class="stat-number">66</div>
+            <div class="stat-number">75</div>
             <div class="stat-label">New Today</div>
         </div>
         <div class="stat">
-            <div class="stat-number">12</div>
+            <div class="stat-number">17</div>
             <div class="stat-label">Companies</div>
         </div>
     </div>
@@ -154,7 +192,7 @@
                 <input type="checkbox" id="filter-visa" checked>
                 <label for="filter-visa">Visa-friendly only</label>
             </div>
-            <span class="results-count"><span id="visible-count">66</span> jobs shown</span>
+            <span class="results-count"><span id="visible-count">75</span> jobs shown</span>
         </div>
         <div class="filter-row">
             <div class="filter-group">
@@ -170,17 +208,22 @@
                 <label for="filter-company">Company:</label>
                 <select id="filter-company">
                     <option value="all">All Companies</option>
-                    <option value="amazon">Amazon</option>
+                    <option value="adevinta">Adevinta</option>
+<option value="amazon">Amazon</option>
 <option value="docplanner">Docplanner</option>
 <option value="fever">Fever</option>
 <option value="glovo">Glovo</option>
+<option value="hp">HP</option>
 <option value="kantox">Kantox</option>
 <option value="lodgify">Lodgify</option>
 <option value="microsoft">Microsoft</option>
+<option value="n26">N26</option>
 <option value="preply">Preply</option>
+<option value="revolut">Revolut</option>
 <option value="socialpoint">Social Point</option>
 <option value="travelperk">TravelPerk (Perk)</option>
 <option value="typeform">Typeform</option>
+<option value="veepee">Veepee</option>
 <option value="wallapop">Wallapop</option>
                 </select>
             </div>
@@ -189,6 +232,114 @@
 
     <div id="jobs">
         
+<div class="job-card" data-visa="yes" data-ethics="neutral" data-worktype="remote" data-company="n26" data-title="senior site reliability engineer - ai platform" data-companyname="n26">
+    <h3><a href="https://n26.com/en-eu/careers/positions/7180173?gh_jid=7180173" target="_blank">Senior Site Reliability Engineer - AI Platform</a><span class="new-badge">NEW</span></h3>
+    <div class="company">N26</div>
+    <div class="meta">Barcelona · Posted: 2026-02-03</div>
+    <div class="tags">
+        <span class="tag tag-remote">Remote</span>
+        <span class="tag tag-visa">Yes (job posting)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="veepee" data-title="sourcing data analyst / data referent (w/m/x) - permanent" data-companyname="veepee">
+    <h3><a href="https://jobs.lever.co/veepee/3de5dd0c-aff2-4db6-ba58-820582e41713" target="_blank">Sourcing Data Analyst / Data Referent (W/M/X) - Permanent</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Veepee</div>
+    <div class="meta">Barcelona · Posted: 2025-12-09</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="veepee" data-title="data scientist" data-companyname="veepee">
+    <h3><a href="https://jobs.lever.co/veepee/45005f0d-e9e0-4b80-989b-4adcec560934" target="_blank">Data Scientist</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Veepee</div>
+    <div class="meta">Barcelona · Posted: 2025-11-03</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="veepee" data-title="data analyst" data-companyname="veepee">
+    <h3><a href="https://jobs.lever.co/veepee/d1d43bff-124f-4aa1-8804-242e5fb52258" target="_blank">Data Analyst</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Veepee</div>
+    <div class="meta">Barcelona · Posted: 2026-01-16</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="veepee" data-title="bi developer" data-companyname="veepee">
+    <h3><a href="https://jobs.lever.co/veepee/d3f3fd15-bd87-445e-b193-e1b10a9094fd" target="_blank">BI Developer</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Veepee</div>
+    <div class="meta">Barcelona · Posted: 2026-01-26</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="revolut" data-title="data scientist - risk" data-companyname="revolut">
+    <h3><a href="https://www.revolut.com/en-US/careers/position/data-scientist-risk-46917c00-41ca-4c82-be38-00894cc2c136/" target="_blank">Data Scientist - Risk</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Revolut</div>
+    <div class="meta">Barcelona, Spain · Posted: 2026-02-04</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="adevinta" data-title="senior data scientist" data-companyname="adevinta">
+    <h3><a href="https://adevinta.com/jobs/senior-data-scientist-4/" target="_blank">Senior Data Scientist</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Adevinta</div>
+    <div class="meta">Barcelona, Spain · Posted: 2026-02-04</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="veepee" data-title="senior data scientist" data-companyname="veepee">
+    <h3><a href="https://jobs.lever.co/veepee/8f314b01-db04-4a89-b4a8-632a136e61df" target="_blank">Senior Data Scientist</a><span class="new-badge">NEW</span></h3>
+    <div class="company">Veepee</div>
+    <div class="meta">Barcelona, Spain · Posted: 2026-02-04</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
+<div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="hp" data-title="ai lab - machine learning engineer" data-companyname="hp">
+    <h3><a href="https://apply.hp.com/careers/job/28359629" target="_blank">AI Lab - Machine Learning Engineer</a><span class="new-badge">NEW</span></h3>
+    <div class="company">HP</div>
+    <div class="meta">Sant Cugat del Vallès, Catalonia, Spain · Posted: 2025-10-10</div>
+    <div class="tags">
+        <span class="tag tag-onsite">In-person</span>
+        <span class="tag tag-likely">Likely (company)</span>
+        <span class="tag tag-ethics-neutral">Neutral</span>
+    </div>
+</div>
+
+
 <div class="job-card" data-visa="likely" data-ethics="neutral" data-worktype="onsite" data-company="microsoft" data-title="senior data and applied scientist" data-companyname="microsoft">
     <h3><a href="https://apply.careers.microsoft.com/careers/job/1970393556640568" target="_blank">Senior Data and Applied Scientist</a><span class="new-badge">NEW</span></h3>
     <div class="company">Microsoft</div>
@@ -980,6 +1131,20 @@
     </div>
 </div>
 
+    </div>
+
+    <div class="manual-section">
+        <h2>Non-Automated Sites (Check Manually)</h2>
+        <div class="manual-sites">
+            <div class="manual-site">
+                <h3><a href="https://www.revolut.com/careers/?city=Spain&team=Data" target="_blank">Revolut</a></h3>
+                <p>Fintech - Data team roles in Spain</p>
+            </div>
+            <div class="manual-site">
+                <h3><a href="https://apply.hp.com/careers?query=data+ai+machine+learning+ml&start=0&location=Barcelona%2C++CT%2C++Spain&pid=39162317&sort_by=relevance&filter_distance=80&filter_include_remote=1" target="_blank">HP</a></h3>
+                <p>AI Lab - Data/ML roles in Barcelona</p>
+            </div>
+        </div>
     </div>
 
     <script>

@@ -130,6 +130,44 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 11px;
             margin-left: 8px;
         }}
+        .manual-section {{
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }}
+        .manual-section h2 {{
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }}
+        .manual-sites {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }}
+        .manual-site {{
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #6c757d;
+        }}
+        .manual-site h3 {{
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }}
+        .manual-site h3 a {{
+            color: #0066cc;
+            text-decoration: none;
+        }}
+        .manual-site h3 a:hover {{
+            text-decoration: underline;
+        }}
+        .manual-site p {{
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+        }}
         @media (max-width: 600px) {{
             .filter-row {{ flex-direction: column; align-items: stretch; }}
             .filter-group {{ width: 100%; }}
@@ -191,6 +229,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     <div id="jobs">
         {jobs_html}
+    </div>
+
+    <div class="manual-section">
+        <h2>Non-Automated Sites (Check Manually)</h2>
+        <div class="manual-sites">
+            <div class="manual-site">
+                <h3><a href="https://www.revolut.com/careers/?city=Spain&team=Data" target="_blank">Revolut</a></h3>
+                <p>Fintech - Data team roles in Spain</p>
+            </div>
+            <div class="manual-site">
+                <h3><a href="https://apply.hp.com/careers?query=data+ai+machine+learning+ml&start=0&location=Barcelona%2C++CT%2C++Spain&pid=39162317&sort_by=relevance&filter_distance=80&filter_include_remote=1" target="_blank">HP</a></h3>
+                <p>AI Lab - Data/ML roles in Barcelona</p>
+            </div>
+        </div>
     </div>
 
     <script>

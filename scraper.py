@@ -17,6 +17,8 @@ from scrapers import (
     scrape_amazon,
     scrape_telefonica,
     scrape_microsoft_email,
+    scrape_hp_email,
+    scrape_revolut_email,
 )
 
 # Setup logging
@@ -62,6 +64,10 @@ def scrape_company(company: dict) -> int:
         jobs = scrape_telefonica(company_id)
     elif ats_platform == 'microsoft_email':
         jobs = scrape_microsoft_email(company_id)
+    elif ats_platform == 'hp_email':
+        jobs = scrape_hp_email(company_id)
+    elif ats_platform == 'revolut_email':
+        jobs = scrape_revolut_email(company_id)
     elif not ats_id:
         logger.warning(f"No ATS ID configured for {company_id}, skipping")
         return 0
