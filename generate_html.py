@@ -224,6 +224,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     {company_options}
                 </select>
             </div>
+            <div class="filter-group">
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by">
+                    <option value="scraped-desc">Recently added</option>
+                    <option value="scraped-asc">Oldest added</option>
+                    <option value="posted-desc">Recently posted</option>
+                    <option value="posted-asc">Oldest posted</option>
+                    <option value="company-asc">Company A-Z</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -250,12 +260,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const visaCheckbox = document.getElementById('filter-visa');
         const worktypeSelect = document.getElementById('filter-worktype');
         const companySelect = document.getElementById('filter-company');
+        const sortSelect = document.getElementById('sort-by');
         const visibleCount = document.getElementById('visible-count');
+        const jobsContainer = document.getElementById('jobs');
 
         searchInput.addEventListener('input', filterJobs);
         visaCheckbox.addEventListener('change', filterJobs);
         worktypeSelect.addEventListener('change', filterJobs);
         companySelect.addEventListener('change', filterJobs);
+        sortSelect.addEventListener('change', sortJobs);
 
         function filterJobs() {{
             const searchTerm = searchInput.value.toLowerCase().trim();
@@ -293,16 +306,39 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             visibleCount.textContent = count;
         }}
+
+        function sortJobs() {{
+            const sortBy = sortSelect.value;
+            const cards = Array.from(document.querySelectorAll('.job-card'));
+
+            cards.sort((a, b) => {{
+                if (sortBy === 'scraped-desc') {{
+                    return b.dataset.scraped.localeCompare(a.dataset.scraped);
+                }} else if (sortBy === 'scraped-asc') {{
+                    return a.dataset.scraped.localeCompare(b.dataset.scraped);
+                }} else if (sortBy === 'posted-desc') {{
+                    return b.dataset.posted.localeCompare(a.dataset.posted);
+                }} else if (sortBy === 'posted-asc') {{
+                    return a.dataset.posted.localeCompare(b.dataset.posted);
+                }} else if (sortBy === 'company-asc') {{
+                    return a.dataset.companyname.localeCompare(b.dataset.companyname);
+                }}
+                return 0;
+            }});
+
+            cards.forEach(card => jobsContainer.appendChild(card));
+            filterJobs();
+        }}
     </script>
 </body>
 </html>
 """
 
 JOB_CARD_TEMPLATE = """
-<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}">
+<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}" data-posted="{posted_sort}" data-scraped="{scraped_sort}">
     <h3><a href="{url}" target="_blank">{title}</a>{new_badge}</h3>
     <div class="company">{company}</div>
-    <div class="meta">{location} · Posted: {posted_date}</div>
+    <div class="meta">{location} · Posted: {posted_date} · Added: {scraped_date}</div>
     <div class="tags">
         <span class="tag tag-{worktype}">{worktype_label}</span>
         <span class="tag tag-{visa_class}">{visa_status}</span>
@@ -419,6 +455,11 @@ def generate_html():
         is_new = job['scraped_date'][:10] == today
         new_badge = '<span class="new-badge">NEW</span>' if is_new else ''
 
+        # Format dates for sorting (use 0000-00-00 for unknown to sort last)
+        posted_sort = job['posted_date'] or '0000-00-00'
+        scraped_sort = job['scraped_date'][:10] if job['scraped_date'] else '0000-00-00'
+        scraped_display = job['scraped_date'][:10] if job['scraped_date'] else 'Unknown'
+
         jobs_html.append(JOB_CARD_TEMPLATE.format(
             title=job['job_title'],
             title_lower=job['job_title'].lower(),
@@ -428,6 +469,9 @@ def generate_html():
             company_lower=company_name.lower(),
             location=job['location'] or 'Barcelona',
             posted_date=job['posted_date'] or 'Unknown',
+            posted_sort=posted_sort,
+            scraped_date=scraped_display,
+            scraped_sort=scraped_sort,
             visa_status=visa_status,
             visa_class=visa_class,
             visa_data=visa_data,
