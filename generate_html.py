@@ -30,12 +30,53 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .updated {{ color: #666; font-size: 14px; margin-bottom: 20px; }}
         .filters {{
             background: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }}
-        .filters label {{ margin-right: 15px; }}
+        .filter-row {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }}
+        .filter-row:last-child {{ margin-bottom: 0; }}
+        .filter-group {{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        .filter-group label {{
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap;
+        }}
+        .filter-group select, .filter-group input[type="text"] {{
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }}
+        .filter-group select {{ min-width: 150px; }}
+        .search-input {{
+            flex: 1;
+            min-width: 200px;
+            max-width: 400px;
+        }}
+        .checkbox-group {{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }}
+        .checkbox-group input {{ margin: 0; }}
+        .results-count {{
+            color: #666;
+            font-size: 14px;
+            margin-left: auto;
+        }}
         .job-card {{
             background: white;
             padding: 20px;
@@ -43,6 +84,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             margin-bottom: 15px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }}
+        .job-card.hidden {{ display: none; }}
         .job-card h3 {{ margin: 0 0 10px 0; }}
         .job-card h3 a {{ color: #0066cc; text-decoration: none; }}
         .job-card h3 a:hover {{ text-decoration: underline; }}
@@ -60,6 +102,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .tag-maybe {{ background: #fff3cd; color: #856404; }}
         .tag-likely {{ background: #cce5ff; color: #004085; }}
         .tag-unknown {{ background: #e9ecef; color: #495057; }}
+        .tag-remote {{ background: #e7f3ff; color: #0056b3; }}
+        .tag-hybrid {{ background: #fff3cd; color: #856404; }}
+        .tag-onsite {{ background: #f0f0f0; color: #555; }}
         .tag-ethics-good {{ background: #d4edda; color: #155724; }}
         .tag-ethics-neutral {{ background: #e9ecef; color: #495057; }}
         .tag-ethics-kinda_evil {{ background: #f8d7da; color: #721c24; }}
@@ -67,6 +112,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }}
         .stat {{
             background: white;
@@ -83,6 +129,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border-radius: 10px;
             font-size: 11px;
             margin-left: 8px;
+        }}
+        @media (max-width: 600px) {{
+            .filter-row {{ flex-direction: column; align-items: stretch; }}
+            .filter-group {{ width: 100%; }}
+            .filter-group select, .search-input {{ width: 100%; max-width: none; }}
+            .results-count {{ margin-left: 0; margin-top: 10px; }}
         }}
     </style>
 </head>
@@ -106,8 +158,35 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="filters">
-        <strong>Filter:</strong>
-        <label><input type="checkbox" id="filter-visa" checked> Visa-friendly</label>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="search">Search:</label>
+                <input type="text" id="search" class="search-input" placeholder="Job title or company...">
+            </div>
+            <div class="filter-group checkbox-group">
+                <input type="checkbox" id="filter-visa" checked>
+                <label for="filter-visa">Visa-friendly only</label>
+            </div>
+            <span class="results-count"><span id="visible-count">{total_jobs}</span> jobs shown</span>
+        </div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label for="filter-worktype">Work type:</label>
+                <select id="filter-worktype">
+                    <option value="all">All</option>
+                    <option value="remote">Remote</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="onsite">In-person</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-company">Company:</label>
+                <select id="filter-company">
+                    <option value="all">All Companies</option>
+                    {company_options}
+                </select>
+            </div>
+        </div>
     </div>
 
     <div id="jobs">
@@ -115,17 +194,52 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <script>
-        document.querySelectorAll('.filters input').forEach(cb => {{
-            cb.addEventListener('change', filterJobs);
-        }});
+        const searchInput = document.getElementById('search');
+        const visaCheckbox = document.getElementById('filter-visa');
+        const worktypeSelect = document.getElementById('filter-worktype');
+        const companySelect = document.getElementById('filter-company');
+        const visibleCount = document.getElementById('visible-count');
+
+        searchInput.addEventListener('input', filterJobs);
+        visaCheckbox.addEventListener('change', filterJobs);
+        worktypeSelect.addEventListener('change', filterJobs);
+        companySelect.addEventListener('change', filterJobs);
 
         function filterJobs() {{
-            const visaOnly = document.getElementById('filter-visa').checked;
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const visaOnly = visaCheckbox.checked;
+            const worktype = worktypeSelect.value;
+            const company = companySelect.value;
 
+            let count = 0;
             document.querySelectorAll('.job-card').forEach(card => {{
                 const hasVisa = card.dataset.visa !== 'unknown';
-                card.style.display = (visaOnly && !hasVisa) ? 'none' : 'block';
+                const cardWorktype = card.dataset.worktype;
+                const cardCompany = card.dataset.company;
+                const cardTitle = card.dataset.title.toLowerCase();
+                const cardCompanyName = card.dataset.companyname.toLowerCase();
+
+                let show = true;
+
+                // Visa filter
+                if (visaOnly && !hasVisa) show = false;
+
+                // Work type filter
+                if (worktype !== 'all' && cardWorktype !== worktype) show = false;
+
+                // Company filter
+                if (company !== 'all' && cardCompany !== company) show = false;
+
+                // Search filter
+                if (searchTerm && !cardTitle.includes(searchTerm) && !cardCompanyName.includes(searchTerm)) {{
+                    show = false;
+                }}
+
+                card.classList.toggle('hidden', !show);
+                if (show) count++;
             }});
+
+            visibleCount.textContent = count;
         }}
     </script>
 </body>
@@ -133,11 +247,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 JOB_CARD_TEMPLATE = """
-<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}">
+<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}">
     <h3><a href="{url}" target="_blank">{title}</a>{new_badge}</h3>
     <div class="company">{company}</div>
     <div class="meta">{location} · Posted: {posted_date}</div>
     <div class="tags">
+        <span class="tag tag-{worktype}">{worktype_label}</span>
         <span class="tag tag-{visa_class}">{visa_status}</span>
         <span class="tag tag-ethics-{ethics}">{ethics_label}</span>
     </div>
@@ -167,6 +282,27 @@ def get_all_jobs() -> list[dict]:
     return [dict(row) for row in rows]
 
 
+def detect_work_type(location: str, description: str) -> tuple[str, str]:
+    """Detect work type from location and description. Returns (type_id, label)."""
+    location = (location or '').lower()
+    description = (description or '').lower()
+    text = location + ' ' + description
+
+    # Check for remote indicators
+    remote_keywords = ['remote', 'work from home', 'wfh', 'fully remote', '100% remote']
+    hybrid_keywords = ['hybrid', 'flexible', '2 days', '3 days', 'days in office', 'days per week']
+
+    if any(kw in text for kw in remote_keywords):
+        # Check if it's actually hybrid
+        if any(kw in text for kw in hybrid_keywords):
+            return 'hybrid', 'Hybrid'
+        return 'remote', 'Remote'
+    elif any(kw in text for kw in hybrid_keywords):
+        return 'hybrid', 'Hybrid'
+    else:
+        return 'onsite', 'In-person'
+
+
 def generate_html():
     jobs = get_all_jobs()
     companies = load_company_info()
@@ -180,6 +316,19 @@ def generate_html():
     new_today = sum(1 for j in barcelona_jobs if j['scraped_date'][:10] == today)
     unique_companies = len(set(j['company_id'] for j in barcelona_jobs))
 
+    # Build company options for dropdown (only companies with jobs)
+    companies_with_jobs = {}
+    for job in barcelona_jobs:
+        cid = job['company_id']
+        if cid not in companies_with_jobs:
+            company_info = companies.get(cid, {})
+            companies_with_jobs[cid] = company_info.get('name', cid)
+
+    company_options = '\n'.join(
+        f'<option value="{cid}">{name}</option>'
+        for cid, name in sorted(companies_with_jobs.items(), key=lambda x: x[1].lower())
+    )
+
     jobs_html = []
     for job in jobs:
         # Filter to Barcelona-only jobs
@@ -189,6 +338,7 @@ def generate_html():
 
         company_info = companies.get(job['company_id'], {})
         company_sponsors = company_info.get('known_visa_sponsor', False)
+        company_name = company_info.get('name', job['company_id'])
 
         # Determine visa status
         if job['mentions_visa']:
@@ -211,13 +361,19 @@ def generate_html():
         ethics = company_info.get('ethics_rating', 'neutral')
         ethics_label = {'good': 'Good', 'neutral': 'Neutral', 'kinda_evil': 'Caution'}.get(ethics, ethics)
 
+        # Detect work type
+        worktype, worktype_label = detect_work_type(job['location'], job.get('description_full'))
+
         is_new = job['scraped_date'][:10] == today
         new_badge = '<span class="new-badge">NEW</span>' if is_new else ''
 
         jobs_html.append(JOB_CARD_TEMPLATE.format(
             title=job['job_title'],
+            title_lower=job['job_title'].lower(),
             url=job['job_url'],
-            company=company_info.get('name', job['company_id']),
+            company=company_name,
+            company_id=job['company_id'],
+            company_lower=company_name.lower(),
             location=job['location'] or 'Barcelona',
             posted_date=job['posted_date'] or 'Unknown',
             visa_status=visa_status,
@@ -225,6 +381,8 @@ def generate_html():
             visa_data=visa_data,
             ethics=ethics,
             ethics_label=ethics_label,
+            worktype=worktype,
+            worktype_label=worktype_label,
             new_badge=new_badge,
         ))
 
@@ -233,6 +391,7 @@ def generate_html():
         total_jobs=len(jobs_html),
         new_today=new_today,
         companies=unique_companies,
+        company_options=company_options,
         jobs_html='\n'.join(jobs_html),
     )
 

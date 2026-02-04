@@ -239,6 +239,54 @@
       "languages": ["English"],
       "known_visa_sponsor": false,
       "notes": "Dragon City maker, Take-Two subsidiary"
+    },
+    {
+      "id": "amazon",
+      "name": "Amazon",
+      "headquarters": "Seattle",
+      "website": "https://amazon.com",
+      "careers_url": "https://www.amazon.jobs/en/locations/barcelona-spain",
+      "ats_platform": "custom",
+      "ats_id": "",
+      "industry": "E-commerce / Cloud / Tech",
+      "employee_count": "1000000+",
+      "ethics_rating": "kinda_evil",
+      "ethics_notes": "Labor practices concerns, warehouse conditions, market dominance",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Massive DS hiring, established visa process. Barcelona office includes AWS and retail teams. Uses custom ATS - needs custom parser."
+    },
+    {
+      "id": "microsoft",
+      "name": "Microsoft",
+      "headquarters": "Redmond",
+      "website": "https://microsoft.com",
+      "careers_url": "https://careers.microsoft.com/",
+      "ats_platform": "custom",
+      "ats_id": "",
+      "industry": "Software / Cloud / AI",
+      "employee_count": "200000+",
+      "ethics_rating": "neutral",
+      "ethics_notes": "Mixed record on privacy, strong on accessibility",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Multinational infrastructure, established visa sponsorship. Barcelona office. Uses custom ATS - needs custom parser."
+    },
+    {
+      "id": "telefonica",
+      "name": "Telefónica",
+      "headquarters": "Madrid",
+      "website": "https://telefonica.com",
+      "careers_url": "https://www.telefonica.com/en/talent/job-offers/",
+      "ats_platform": "custom",
+      "ats_id": "",
+      "industry": "Telecommunications",
+      "employee_count": "100000+",
+      "ethics_rating": "neutral",
+      "ethics_notes": "Major Spanish telecom, data privacy considerations",
+      "languages": ["Spanish", "English"],
+      "known_visa_sponsor": true,
+      "notes": "Spanish giant, explicitly sponsors visas. Strong presence in Barcelona. Uses custom ATS - needs custom parser."
     }
   ]
 }
