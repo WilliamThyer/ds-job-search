@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local
+.env
+cron.log
+data/cron.log
+data/scraper.log
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
