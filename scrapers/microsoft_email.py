@@ -138,8 +138,8 @@ def _parse_microsoft_email(company_id: str, msg: email.message.Message) -> list[
 
     soup = BeautifulSoup(body, "html.parser")
 
-    # Look for job links - Microsoft careers URLs
-    job_links = soup.find_all("a", href=re.compile(r"careers\.microsoft\.com|jobs\.careers\.microsoft\.com"))
+    # Look for job links - Microsoft careers URLs (including Eightfold ATS)
+    job_links = soup.find_all("a", href=re.compile(r"careers\.microsoft\.com|jobs\.careers\.microsoft\.com|microsoft\.eightfold\.ai"))
 
     for link in job_links:
         href = link.get("href", "")
