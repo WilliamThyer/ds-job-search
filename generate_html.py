@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from models import DB_PATH
+from utils import is_great_fit
 import sqlite3
 
 COMPANIES_FILE = Path(__file__).parent / "data" / "companies.json"
@@ -130,6 +131,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 11px;
             margin-left: 8px;
         }}
+        .greatfit-badge {{
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 8px;
+        }}
         .manual-section {{
             margin-top: 40px;
             padding-top: 20px;
@@ -205,6 +214,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <input type="checkbox" id="filter-visa" checked>
                 <label for="filter-visa">Visa-friendly only</label>
             </div>
+            <div class="filter-group checkbox-group">
+                <input type="checkbox" id="filter-greatfit">
+                <label for="filter-greatfit">Great fits only</label>
+            </div>
             <span class="results-count"><span id="visible-count">{total_jobs}</span> jobs shown</span>
         </div>
         <div class="filter-row">
@@ -258,6 +271,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <script>
         const searchInput = document.getElementById('search');
         const visaCheckbox = document.getElementById('filter-visa');
+        const greatfitCheckbox = document.getElementById('filter-greatfit');
         const worktypeSelect = document.getElementById('filter-worktype');
         const companySelect = document.getElementById('filter-company');
         const sortSelect = document.getElementById('sort-by');
@@ -266,6 +280,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         searchInput.addEventListener('input', filterJobs);
         visaCheckbox.addEventListener('change', filterJobs);
+        greatfitCheckbox.addEventListener('change', filterJobs);
         worktypeSelect.addEventListener('change', filterJobs);
         companySelect.addEventListener('change', filterJobs);
         sortSelect.addEventListener('change', sortJobs);
@@ -273,12 +288,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         function filterJobs() {{
             const searchTerm = searchInput.value.toLowerCase().trim();
             const visaOnly = visaCheckbox.checked;
+            const greatfitOnly = greatfitCheckbox.checked;
             const worktype = worktypeSelect.value;
             const company = companySelect.value;
 
             let count = 0;
             document.querySelectorAll('.job-card').forEach(card => {{
                 const hasVisa = card.dataset.visa !== 'unknown';
+                const isGreatFit = card.dataset.greatfit === 'true';
                 const cardWorktype = card.dataset.worktype;
                 const cardCompany = card.dataset.company;
                 const cardTitle = card.dataset.title.toLowerCase();
@@ -288,6 +305,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
                 // Visa filter
                 if (visaOnly && !hasVisa) show = false;
+
+                // Great fit filter
+                if (greatfitOnly && !isGreatFit) show = false;
 
                 // Work type filter
                 if (worktype !== 'all' && cardWorktype !== worktype) show = false;
@@ -335,8 +355,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 JOB_CARD_TEMPLATE = """
-<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}" data-posted="{posted_sort}" data-scraped="{scraped_sort}">
-    <h3><a href="{url}" target="_blank">{title}</a>{new_badge}</h3>
+<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}" data-posted="{posted_sort}" data-scraped="{scraped_sort}" data-greatfit="{greatfit}">
+    <h3><a href="{url}" target="_blank">{title}</a>{new_badge}{greatfit_badge}</h3>
     <div class="company">{company}</div>
     <div class="meta">{location} · Posted: {posted_date} · Added: {scraped_date}</div>
     <div class="tags">
@@ -460,6 +480,10 @@ def generate_html():
         scraped_sort = job['scraped_date'][:10] if job['scraped_date'] else '0000-00-00'
         scraped_display = job['scraped_date'][:10] if job['scraped_date'] else 'Unknown'
 
+        # Check if great fit
+        great_fit = is_great_fit(job['job_title'], job.get('description_full') or '')
+        greatfit_badge = '<span class="greatfit-badge">GREAT FIT</span>' if great_fit else ''
+
         jobs_html.append(JOB_CARD_TEMPLATE.format(
             title=job['job_title'],
             title_lower=job['job_title'].lower(),
@@ -480,6 +504,8 @@ def generate_html():
             worktype=worktype,
             worktype_label=worktype_label,
             new_badge=new_badge,
+            greatfit='true' if great_fit else 'false',
+            greatfit_badge=greatfit_badge,
         ))
 
     html = HTML_TEMPLATE.format(

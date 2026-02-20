@@ -32,6 +32,59 @@ DATA_ROLE_KEYWORDS = [
     'data science',
 ]
 
+# Great fit keywords (strict - core DS/ML/AI roles only)
+GREAT_FIT_KEYWORDS = [
+    'data scientist',
+    'data science',
+    'machine learning engineer',
+    'ml engineer',
+    'mle',
+    'data analyst',
+    'ai engineer',
+    'applied scientist',
+    'research scientist',
+    'deep learning',
+    'nlp engineer',
+    'computer vision engineer',
+    'artificial intelligence',
+]
+
+# Keywords that disqualify a role from being a "great fit"
+GREAT_FIT_EXCLUSIONS = [
+    'intern',
+    'internship',
+    'product manager',
+    'product owner',
+    'software engineer',
+    'software developer',
+    'backend engineer',
+    'frontend engineer',
+    'full stack',
+    'fullstack',
+    'devops',
+    'sre',
+    'site reliability',
+    'account manager',
+    'sales',
+    'marketing',
+    'recruiter',
+    'hr ',
+    'human resources',
+    'content',
+    'designer',
+    'ux ',
+    'ui ',
+    'customer success',
+    'support engineer',
+    'qa engineer',
+    'test engineer',
+    'project manager',
+    'program manager',
+    'business analyst',
+    'financial analyst',
+    'junior',  # Often indicates entry-level non-DS
+]
+
 # Keywords that suggest visa/relocation support
 VISA_KEYWORDS = [
     'visa sponsorship',
@@ -96,6 +149,36 @@ def is_data_role(title: str, description: str) -> bool:
     for keyword in DATA_ROLE_KEYWORDS:
         if keyword in text:
             return True
+
+    return False
+
+
+def is_great_fit(title: str, description: str = "") -> bool:
+    """
+    Check if job is a great fit (core DS/ML/AI role).
+    More strict than is_data_role - excludes internships, PMs, SWEs, etc.
+    Based primarily on title, with description as tiebreaker.
+    """
+    title_lower = title.lower()
+
+    # Check for exclusions first (in title only)
+    for exclusion in GREAT_FIT_EXCLUSIONS:
+        if exclusion in title_lower:
+            return False
+
+    # Check for great fit keywords in title
+    for keyword in GREAT_FIT_KEYWORDS:
+        if keyword in title_lower:
+            return True
+
+    # Fallback: check description if title didn't match
+    if description:
+        desc_lower = description.lower()
+        # Only match if strong signal in description AND no exclusions
+        strong_signals = ['data scientist', 'machine learning engineer', 'ml engineer', 'data analyst']
+        for signal in strong_signals:
+            if signal in desc_lower:
+                return True
 
     return False
 
