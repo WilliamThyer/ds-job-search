@@ -44,7 +44,7 @@ def scrape_microsoft_email(company_id: str, days_back: int = 7) -> list[Job]:
         List of Job objects
     """
     if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
-        logger.error("Gmail credentials not configured in .env")
+        logger.info("Gmail credentials not configured, skipping Microsoft email scraper")
         return []
 
     jobs = []
@@ -52,7 +52,11 @@ def scrape_microsoft_email(company_id: str, days_back: int = 7) -> list[Job]:
     try:
         # Connect to Gmail IMAP
         mail = imaplib.IMAP4_SSL("imap.gmail.com")
-        mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+        try:
+            mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+        except imaplib.IMAP4.error as e:
+            logger.warning(f"Gmail authentication failed, skipping Microsoft email scraper: {e}")
+            return []
         mail.select("inbox")
 
         # Search for Microsoft job alert emails from the last N days

@@ -57,6 +57,10 @@ def scrape_company(company: dict) -> int:
     ats_platform = company.get('ats_platform', 'custom')
     ats_id = company.get('ats_id', '')
 
+    # Manual platforms - skip silently
+    if ats_platform == 'manual':
+        return 0
+
     # Custom scrapers that don't need ats_id
     if ats_platform == 'amazon':
         jobs = scrape_amazon(company_id)
