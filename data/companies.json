@@ -422,7 +422,7 @@
       "headquarters": "Walldorf",
       "website": "https://sap.com",
       "careers_url": "https://jobs.sap.com/",
-      "ats_platform": "manual",
+      "ats_platform": "sap",
       "ats_id": "",
       "industry": "Enterprise Software",
       "employee_count": "100000+",
@@ -430,7 +430,7 @@
       "ethics_notes": "Enterprise software giant",
       "languages": ["English"],
       "known_visa_sponsor": true,
-      "notes": "Digital Hub Barcelona, uses SuccessFactors ATS"
+      "notes": "Digital Hub Barcelona"
     },
     {
       "id": "mango",

@@ -20,6 +20,7 @@ from scrapers import (
     scrape_hp_email,
     scrape_revolut_email,
     scrape_workday,
+    scrape_sap,
 )
 
 # Setup logging
@@ -75,6 +76,8 @@ def scrape_company(company: dict) -> int:
         jobs = scrape_revolut_email(company_id)
     elif ats_platform == 'workday':
         jobs = scrape_workday(company_id)
+    elif ats_platform == 'sap':
+        jobs = scrape_sap(company_id)
     elif not ats_id:
         logger.warning(f"No ATS ID configured for {company_id}, skipping")
         return 0
