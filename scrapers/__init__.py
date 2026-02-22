@@ -9,6 +9,7 @@ from .amazon import scrape_amazon
 from .telefonica import scrape_telefonica
 from .microsoft_email import scrape_microsoft_email
 from .email_alerts import scrape_hp_email, scrape_revolut_email
+from .workday import scrape_workday, scrape_mango
 
 __all__ = [
     'scrape_greenhouse',
@@ -21,4 +22,6 @@ __all__ = [
     'scrape_microsoft_email',
     'scrape_hp_email',
     'scrape_revolut_email',
+    'scrape_workday',
+    'scrape_mango',
 ]

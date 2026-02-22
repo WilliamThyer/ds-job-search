@@ -12,6 +12,10 @@ BARCELONA_PATTERNS = [
     r'\bremote\b.*\bspain\b',
     r'\bhybrid\b.*\bbarcelona\b',
     r'\bbarcelona\b.*\bhybrid\b',
+    r'\bpalau\b',  # Palau Solità i Plegamans (near Barcelona)
+    r'\bsant cugat\b',  # Sant Cugat del Vallès
+    r'\bespaña\b',  # Spain in Spanish
+    r'\bcatalun',  # Catalonia/Catalunya
 ]
 
 # Data role keywords (broad for high recall)

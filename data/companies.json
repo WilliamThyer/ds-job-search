@@ -438,7 +438,7 @@
       "headquarters": "Barcelona",
       "website": "https://mango.com",
       "careers_url": "https://mango.wd3.myworkdayjobs.com/",
-      "ats_platform": "manual",
+      "ats_platform": "workday",
       "ats_id": "",
       "industry": "Fashion / Retail",
       "employee_count": "15000+",
@@ -446,7 +446,7 @@
       "ethics_notes": "Fast fashion, sustainability initiatives",
       "languages": ["Spanish", "English"],
       "known_visa_sponsor": false,
-      "notes": "Fashion retailer HQ in Barcelona, uses Workday"
+      "notes": "Fashion retailer HQ in Barcelona"
     },
     {
       "id": "desigual",
