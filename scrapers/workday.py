@@ -13,9 +13,13 @@ from utils import is_barcelona_role, is_data_role, detect_visa_mentions
 logger = logging.getLogger(__name__)
 
 # Workday company configurations
-# Format: company_id -> (tenant, wd_instance, site_id)
+# Format: company_id -> (tenant, wd_instance, site_id, search_text)
+# search_text: pre-filter term to reduce result set for large companies (e.g. "Barcelona")
+#   Empty string fetches all jobs (fine for small/mid-size companies).
 WORKDAY_COMPANIES = {
-    "mango": ("mango", "wd3", "Mango_Work_Your_Passion"),
+    "mango":      ("mango",      "wd3",   "Mango_Work_Your_Passion", ""),
+    "accenture":  ("accenture",  "wd103", "AccentureCareers",        "Barcelona"),
+    "clarivate":  ("clarivate",  "wd3",   "Clarivate_Careers",       "Barcelona"),
 }
 
 
@@ -33,7 +37,7 @@ def scrape_workday(company_id: str) -> list[Job]:
         logger.warning(f"No Workday config for {company_id}")
         return []
 
-    tenant, wd_instance, site_id = WORKDAY_COMPANIES[company_id]
+    tenant, wd_instance, site_id, search_text = WORKDAY_COMPANIES[company_id]
     base_url = f"https://{tenant}.{wd_instance}.myworkdayjobs.com"
 
     try:
@@ -74,7 +78,7 @@ def scrape_workday(company_id: str) -> list[Job]:
                 "appliedFacets": {},
                 "limit": limit,
                 "offset": offset,
-                "searchText": ""
+                "searchText": search_text,
             }
 
             resp = session.post(api_url, headers=headers, json=body, timeout=30)
@@ -130,13 +134,26 @@ def _parse_workday_job(company_id: str, job_data: dict, base_url: str, site_id: 
     # Build full URL
     job_url = f"{base_url}/en-US/{site_id}{external_path}"
 
-    # Extract location from bulletFields
+    # Extract location: prefer locationsText (available on newer WD instances),
+    # fall back to bulletFields (Mango-style: [city, region, ...])
+    locations_text = job_data.get("locationsText", "")
     bullet_fields = job_data.get("bulletFields", [])
-    location = bullet_fields[0] if bullet_fields else "Unknown"
 
-    # Add region/country if available
-    if len(bullet_fields) > 1:
-        location = f"{bullet_fields[0]}, {bullet_fields[1]}"
+    if locations_text:
+        location = locations_text
+    elif bullet_fields:
+        # bulletFields[0] may be a job code (e.g. "R00308032", "JREQ135040")
+        # rather than a location. Detect by checking if it has no spaces and
+        # looks like an ID (letters+digits only). In that case use [1] for location.
+        first = bullet_fields[0]
+        if len(bullet_fields) > 1 and first.replace(" ", "") == first and any(c.isdigit() for c in first):
+            location = bullet_fields[1]
+        else:
+            location = first
+            if len(bullet_fields) > 1:
+                location = f"{first}, {bullet_fields[1]}"
+    else:
+        location = "Unknown"
 
     # Time type (Full time, Part time, etc.)
     time_type = job_data.get("timeType", "")

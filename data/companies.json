@@ -374,7 +374,7 @@
       "headquarters": "Barcelona",
       "website": "https://holaluz.com",
       "careers_url": "https://holaluz-1.factorial.es/",
-      "ats_platform": "manual",
+      "ats_platform": "factorial",
       "ats_id": "",
       "industry": "Energy / Green Tech",
       "employee_count": "500+",
@@ -382,7 +382,7 @@
       "ethics_notes": "Green energy provider, sustainability focus",
       "languages": ["Spanish", "English"],
       "known_visa_sponsor": false,
-      "notes": "Green energy startup, uses Factorial ATS"
+      "notes": "Green energy startup"
     },
     {
       "id": "edreams",
@@ -390,7 +390,7 @@
       "headquarters": "Barcelona",
       "website": "https://edreamsodigeo.com",
       "careers_url": "https://www.edreamsodigeocareers.com/",
-      "ats_platform": "manual",
+      "ats_platform": "edreams",
       "ats_id": "",
       "industry": "Travel / E-commerce",
       "employee_count": "1000+",
@@ -454,7 +454,7 @@
       "headquarters": "Barcelona",
       "website": "https://desigual.com",
       "careers_url": "https://jobs.desigual.com/",
-      "ats_platform": "manual",
+      "ats_platform": "desigual",
       "ats_id": "",
       "industry": "Fashion / Retail",
       "employee_count": "3000+",
@@ -470,7 +470,7 @@
       "headquarters": "Zurich",
       "website": "https://zurich.com",
       "careers_url": "https://www.careers.zurich.com/",
-      "ats_platform": "manual",
+      "ats_platform": "zurich",
       "ats_id": "",
       "industry": "Insurance",
       "employee_count": "50000+",
@@ -478,15 +478,15 @@
       "ethics_notes": "Major insurer",
       "languages": ["English", "Spanish"],
       "known_visa_sponsor": true,
-      "notes": "Data center in Barcelona"
+      "notes": "ServiZurich tech hub in Barcelona. J2W/SAP SuccessFactors RSS feed."
     },
     {
       "id": "accenture",
       "name": "Accenture",
       "headquarters": "Dublin",
       "website": "https://accenture.com",
-      "careers_url": "https://www.accenture.com/es-es/careers",
-      "ats_platform": "manual",
+      "careers_url": "https://accenture.wd103.myworkdayjobs.com/AccentureCareers",
+      "ats_platform": "workday",
       "ats_id": "",
       "industry": "Consulting / Technology",
       "employee_count": "700000+",
@@ -494,7 +494,7 @@
       "ethics_notes": "Major consultancy",
       "languages": ["English", "Spanish"],
       "known_visa_sponsor": true,
-      "notes": "Analytics Innovation Centre in Barcelona"
+      "notes": "Analytics Innovation Centre in Barcelona. Workday tenant: accenture/wd103."
     },
     {
       "id": "bsc",
@@ -502,7 +502,7 @@
       "headquarters": "Barcelona",
       "website": "https://bsc.es",
       "careers_url": "https://www.bsc.es/join-us/job-opportunities",
-      "ats_platform": "manual",
+      "ats_platform": "bsc",
       "ats_id": "",
       "industry": "Research / HPC",
       "employee_count": "700+",
@@ -517,8 +517,8 @@
       "name": "Clarivate",
       "headquarters": "London",
       "website": "https://clarivate.com",
-      "careers_url": "https://careers.clarivate.com/",
-      "ats_platform": "manual",
+      "careers_url": "https://clarivate.wd3.myworkdayjobs.com/Clarivate_Careers",
+      "ats_platform": "workday",
       "ats_id": "",
       "industry": "Data Analytics / Information Services",
       "employee_count": "8000+",
@@ -526,7 +526,7 @@
       "ethics_notes": "Academic/IP data services",
       "languages": ["English"],
       "known_visa_sponsor": true,
-      "notes": "Web of Science, Derwent - uses Workday"
+      "notes": "Web of Science, Derwent. Phenom People frontend, Workday backend (wd3). Location in locationsText field."
     }
   ]
 }

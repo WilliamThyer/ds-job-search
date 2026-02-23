@@ -26,6 +26,7 @@ DATA_ROLE_KEYWORDS = [
     'machine learning',
     'ml engineer',
     'ai engineer',
+    'ai specialist',
     'artificial intelligence',
     'analytics engineer',
     'applied scientist',

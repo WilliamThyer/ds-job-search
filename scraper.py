@@ -21,6 +21,11 @@ from scrapers import (
     scrape_revolut_email,
     scrape_workday,
     scrape_sap,
+    scrape_factorial,
+    scrape_edreams,
+    scrape_desigual,
+    scrape_bsc,
+    scrape_zurich,
 )
 
 # Setup logging
@@ -78,6 +83,16 @@ def scrape_company(company: dict) -> int:
         jobs = scrape_workday(company_id)
     elif ats_platform == 'sap':
         jobs = scrape_sap(company_id)
+    elif ats_platform == 'factorial':
+        jobs = scrape_factorial(company_id)
+    elif ats_platform == 'edreams':
+        jobs = scrape_edreams(company_id)
+    elif ats_platform == 'desigual':
+        jobs = scrape_desigual(company_id)
+    elif ats_platform == 'bsc':
+        jobs = scrape_bsc(company_id)
+    elif ats_platform == 'zurich':
+        jobs = scrape_zurich(company_id)
     elif not ats_id:
         logger.warning(f"No ATS ID configured for {company_id}, skipping")
         return 0

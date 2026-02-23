@@ -11,6 +11,11 @@ from .microsoft_email import scrape_microsoft_email
 from .email_alerts import scrape_hp_email, scrape_revolut_email
 from .workday import scrape_workday, scrape_mango
 from .sap import scrape_sap
+from .zurich import scrape_zurich
+from .factorial import scrape_factorial, scrape_holaluz
+from .edreams import scrape_edreams
+from .desigual import scrape_desigual
+from .bsc import scrape_bsc
 
 __all__ = [
     'scrape_greenhouse',
@@ -26,4 +31,10 @@ __all__ = [
     'scrape_workday',
     'scrape_mango',
     'scrape_sap',
+    'scrape_factorial',
+    'scrape_holaluz',
+    'scrape_edreams',
+    'scrape_desigual',
+    'scrape_bsc',
+    'scrape_zurich',
 ]
