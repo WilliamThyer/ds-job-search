@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcelona DS Jobs - Companies</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #333; }
+        .nav { margin-bottom: 20px; }
+        .nav a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 8px;
+        }
+        .nav a:hover { background: #f0f0f0; }
+        .nav a.active { background: #0066cc; color: white; }
+        .updated { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .table-wrap {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background: #f8f9fa;
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        thead th:hover { background: #e9ecef; }
+        thead th.sort-asc::after { content: " ▲"; font-size: 10px; }
+        thead th.sort-desc::after { content: " ▼"; font-size: 10px; }
+        tbody tr:nth-child(even) { background: #fafafa; }
+        tbody tr:hover { background: #f0f4ff; }
+        td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        td a { color: #0066cc; text-decoration: none; }
+        td a:hover { text-decoration: underline; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .badge-yes { background: #d4edda; color: #155724; }
+        .badge-likely { background: #cce5ff; color: #004085; }
+        .badge-no { background: #f8d7da; color: #721c24; }
+        .badge-unknown { background: #e9ecef; color: #495057; }
+        .badge-good { background: #d4edda; color: #155724; }
+        .badge-neutral { background: #e9ecef; color: #495057; }
+        .badge-kinda_evil { background: #f8d7da; color: #721c24; }
+        .jobs-count {
+            font-weight: 600;
+            color: #0066cc;
+        }
+        .jobs-zero { color: #aaa; }
+        .filters {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filters label { font-weight: 500; color: #555; }
+        .filters input[type="text"] {
+            padding: 7px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 220px;
+        }
+        .filters input[type="checkbox"] { margin: 0 4px 0 0; }
+        .row-count { color: #666; font-size: 13px; margin-left: auto; }
+    </style>
+</head>
+<body>
+    <h1>Barcelona Data Science Jobs</h1>
+    <div class="nav">
+        <a href="index.html">Jobs</a>
+        <a href="companies.html" class="active">Companies</a>
+    </div>
+    <p class="updated">Last updated: 2026-02-23 00:21 UTC &mdash; 33 companies tracked</p>
+
+    <div class="filters">
+        <label>Search: <input type="text" id="search" placeholder="Company or industry..."></label>
+        <label><input type="checkbox" id="filter-visa"> Visa sponsors only</label>
+        <label><input type="checkbox" id="filter-jobs"> Has open jobs only</label>
+        <span class="row-count"><span id="row-count">33</span> companies shown</span>
+    </div>
+
+    <div class="table-wrap">
+        <table id="company-table">
+            <thead>
+                <tr>
+                    <th data-col="name">Company</th>
+                    <th data-col="industry">Industry</th>
+                    <th data-col="hq">HQ</th>
+                    <th data-col="jobs" class="sort-desc">Open Jobs</th>
+                    <th data-col="greatfit">Great Fit</th>
+                    <th data-col="visa">Visa</th>
+                    <th data-col="ethics">Ethics</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr data-name="360learning" data-industry="corporate learning / edtech" data-visa="no" data-jobs="0" data-greatfit="0">
+                    <td><a href="https://jobs.lever.co/360learning" target="_blank">360Learning</a></td>
+                    <td>Corporate Learning / EdTech</td>
+                    <td>Paris</td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="accenture" data-industry="consulting / technology" data-visa="yes" data-jobs="2" data-greatfit="2">
+                    <td><a href="https://accenture.wd103.myworkdayjobs.com/AccentureCareers" target="_blank">Accenture</a></td>
+                    <td>Consulting / Technology</td>
+                    <td>Dublin</td>
+                    <td><a class="jobs-count" href="index.html?company=accenture">2</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="adevinta" data-industry="classifieds / marketplace" data-visa="yes" data-jobs="1" data-greatfit="1">
+                    <td><a href="https://jobs.adevinta.com" target="_blank">Adevinta</a></td>
+                    <td>Classifieds / Marketplace</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=adevinta">1</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="amazon" data-industry="e-commerce / cloud / tech" data-visa="yes" data-jobs="8" data-greatfit="0">
+                    <td><a href="https://www.amazon.jobs/en/locations/barcelona-spain" target="_blank">Amazon</a></td>
+                    <td>E-commerce / Cloud / Tech</td>
+                    <td>Seattle</td>
+                    <td><a class="jobs-count" href="index.html?company=amazon">8</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-kinda_evil">Caution</span></td>
+                </tr>
+                <tr data-name="barcelona supercomputing center" data-industry="research / hpc" data-visa="yes" data-jobs="5" data-greatfit="3">
+                    <td><a href="https://www.bsc.es/join-us/job-opportunities" target="_blank">Barcelona Supercomputing Center</a></td>
+                    <td>Research / HPC</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=bsc">5</a></td>
+                    <td><span class="jobs-count">3</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="clarivate" data-industry="data analytics / information services" data-visa="yes" data-jobs="3" data-greatfit="3">
+                    <td><a href="https://clarivate.wd3.myworkdayjobs.com/Clarivate_Careers" target="_blank">Clarivate</a></td>
+                    <td>Data Analytics / Information Services</td>
+                    <td>London</td>
+                    <td><a class="jobs-count" href="index.html?company=clarivate">3</a></td>
+                    <td><span class="jobs-count">3</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="criteo" data-industry="adtech" data-visa="yes" data-jobs="1" data-greatfit="1">
+                    <td><a href="https://careers.criteo.com/" target="_blank">Criteo</a></td>
+                    <td>AdTech</td>
+                    <td>Paris</td>
+                    <td><a class="jobs-count" href="index.html?company=criteo">1</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="desigual" data-industry="fashion / retail" data-visa="no" data-jobs="1" data-greatfit="0">
+                    <td><a href="https://jobs.desigual.com/" target="_blank">Desigual</a></td>
+                    <td>Fashion / Retail</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=desigual">1</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="docplanner" data-industry="healthcare tech" data-visa="yes" data-jobs="5" data-greatfit="0">
+                    <td><a href="https://jobs.smartrecruiters.com/Docplanner" target="_blank">Docplanner</a></td>
+                    <td>Healthcare Tech</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=docplanner">5</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="edreams odigeo" data-industry="travel / e-commerce" data-visa="yes" data-jobs="3" data-greatfit="0">
+                    <td><a href="https://www.edreamsodigeocareers.com/" target="_blank">eDreams ODIGEO</a></td>
+                    <td>Travel / E-commerce</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=edreams">3</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="factorial" data-industry="hr tech / saas" data-visa="yes" data-jobs="0" data-greatfit="0">
+                    <td><a href="https://careers.factorialhr.com" target="_blank">Factorial</a></td>
+                    <td>HR Tech / SaaS</td>
+                    <td>Barcelona</td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="fever" data-industry="events / entertainment tech" data-visa="no" data-jobs="11" data-greatfit="2">
+                    <td><a href="https://careers.feverup.com/" target="_blank">Fever</a></td>
+                    <td>Events / Entertainment Tech</td>
+                    <td>Madrid</td>
+                    <td><a class="jobs-count" href="index.html?company=fever">11</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="glovo" data-industry="food delivery / logistics" data-visa="yes" data-jobs="15" data-greatfit="7">
+                    <td><a href="https://boards.greenhouse.io/glovo" target="_blank">Glovo</a></td>
+                    <td>Food Delivery / Logistics</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=glovo">15</a></td>
+                    <td><span class="jobs-count">7</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="holaluz" data-industry="energy / green tech" data-visa="no" data-jobs="1" data-greatfit="0">
+                    <td><a href="https://holaluz-1.factorial.es/" target="_blank">Holaluz</a></td>
+                    <td>Energy / Green Tech</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=holaluz">1</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="hp" data-industry="hardware / technology" data-visa="yes" data-jobs="1" data-greatfit="1">
+                    <td><a href="https://apply.hp.com/careers?query=data+ai+machine+learning+ml&location=Barcelona" target="_blank">HP</a></td>
+                    <td>Hardware / Technology</td>
+                    <td>Palo Alto</td>
+                    <td><a class="jobs-count" href="index.html?company=hp">1</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="kantox" data-industry="fintech / fx" data-visa="no" data-jobs="2" data-greatfit="0">
+                    <td><a href="https://apply.workable.com/kantox/" target="_blank">Kantox</a></td>
+                    <td>Fintech / FX</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=kantox">2</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="king (activision blizzard)" data-industry="gaming" data-visa="yes" data-jobs="0" data-greatfit="0">
+                    <td><a href="https://careers.king.com" target="_blank">King (Activision Blizzard)</a></td>
+                    <td>Gaming</td>
+                    <td>Stockholm</td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-kinda_evil">Caution</span></td>
+                </tr>
+                <tr data-name="lodgify" data-industry="vacation rental saas" data-visa="no" data-jobs="3" data-greatfit="2">
+                    <td><a href="https://jobs.lever.co/lodgify" target="_blank">Lodgify</a></td>
+                    <td>Vacation Rental SaaS</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=lodgify">3</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="mango" data-industry="fashion / retail" data-visa="no" data-jobs="4" data-greatfit="4">
+                    <td><a href="https://mango.wd3.myworkdayjobs.com/" target="_blank">Mango</a></td>
+                    <td>Fashion / Retail</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=mango">4</a></td>
+                    <td><span class="jobs-count">4</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="manychat" data-industry="saas / marketing automation" data-visa="no" data-jobs="5" data-greatfit="0">
+                    <td><a href="https://job-boards.greenhouse.io/manychat" target="_blank">Manychat</a></td>
+                    <td>SaaS / Marketing Automation</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=manychat">5</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="microsoft" data-industry="software / cloud / ai" data-visa="yes" data-jobs="5" data-greatfit="4">
+                    <td><a href="https://careers.microsoft.com/" target="_blank">Microsoft</a></td>
+                    <td>Software / Cloud / AI</td>
+                    <td>Redmond</td>
+                    <td><a class="jobs-count" href="index.html?company=microsoft">5</a></td>
+                    <td><span class="jobs-count">4</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="n26" data-industry="fintech / banking" data-visa="yes" data-jobs="5" data-greatfit="2">
+                    <td><a href="https://n26.com/en-eu/careers" target="_blank">N26</a></td>
+                    <td>Fintech / Banking</td>
+                    <td>Berlin</td>
+                    <td><a class="jobs-count" href="index.html?company=n26">5</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="preply" data-industry="edtech" data-visa="yes" data-jobs="23" data-greatfit="12">
+                    <td><a href="https://preply.com/en/careers" target="_blank">Preply</a></td>
+                    <td>EdTech</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=preply">23</a></td>
+                    <td><span class="jobs-count">12</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="revolut" data-industry="fintech / banking" data-visa="yes" data-jobs="1" data-greatfit="1">
+                    <td><a href="https://www.revolut.com/careers/?city=Spain&team=Data" target="_blank">Revolut</a></td>
+                    <td>Fintech / Banking</td>
+                    <td>London</td>
+                    <td><a class="jobs-count" href="index.html?company=revolut">1</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="sap" data-industry="enterprise software" data-visa="yes" data-jobs="1" data-greatfit="0">
+                    <td><a href="https://jobs.sap.com/" target="_blank">SAP</a></td>
+                    <td>Enterprise Software</td>
+                    <td>Walldorf</td>
+                    <td><a class="jobs-count" href="index.html?company=sap">1</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="social point" data-industry="gaming" data-visa="no" data-jobs="4" data-greatfit="2">
+                    <td><a href="https://job-boards.greenhouse.io/spcareers" target="_blank">Social Point</a></td>
+                    <td>Gaming</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=socialpoint">4</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-no">No</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="stuart" data-industry="logistics / delivery" data-visa="yes" data-jobs="0" data-greatfit="0">
+                    <td><a href="https://stuart.com/careers/" target="_blank">Stuart</a></td>
+                    <td>Logistics / Delivery</td>
+                    <td>Paris</td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="telefónica" data-industry="telecommunications" data-visa="yes" data-jobs="0" data-greatfit="0">
+                    <td><a href="https://jobs.telefonica.com/search/?locationsearch=barcelona" target="_blank">Telefónica</a></td>
+                    <td>Telecommunications</td>
+                    <td>Madrid</td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="travelperk (perk)" data-industry="travel tech / saas" data-visa="yes" data-jobs="5" data-greatfit="1">
+                    <td><a href="https://www.perk.com/careers/" target="_blank">TravelPerk (Perk)</a></td>
+                    <td>Travel Tech / SaaS</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=travelperk">5</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="typeform" data-industry="saas / forms" data-visa="yes" data-jobs="3" data-greatfit="1">
+                    <td><a href="https://www.typeform.com/careers/" target="_blank">Typeform</a></td>
+                    <td>SaaS / Forms</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=typeform">3</a></td>
+                    <td><span class="jobs-count">1</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="veepee" data-industry="e-commerce / flash sales" data-visa="yes" data-jobs="5" data-greatfit="5">
+                    <td><a href="https://jobs.lever.co/veepee" target="_blank">Veepee</a></td>
+                    <td>E-commerce / Flash Sales</td>
+                    <td>Paris</td>
+                    <td><a class="jobs-count" href="index.html?company=veepee">5</a></td>
+                    <td><span class="jobs-count">5</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+                <tr data-name="wallapop" data-industry="marketplace / e-commerce" data-visa="yes" data-jobs="6" data-greatfit="2">
+                    <td><a href="https://boards.greenhouse.io/wallapop" target="_blank">Wallapop</a></td>
+                    <td>Marketplace / E-commerce</td>
+                    <td>Barcelona</td>
+                    <td><a class="jobs-count" href="index.html?company=wallapop">6</a></td>
+                    <td><span class="jobs-count">2</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-good">Good</span></td>
+                </tr>
+                <tr data-name="zurich insurance" data-industry="insurance" data-visa="yes" data-jobs="2" data-greatfit="0">
+                    <td><a href="https://www.careers.zurich.com/" target="_blank">Zurich Insurance</a></td>
+                    <td>Insurance</td>
+                    <td>Zurich</td>
+                    <td><a class="jobs-count" href="index.html?company=zurich">2</a></td>
+                    <td><span class="jobs-zero">0</span></td>
+                    <td><span class="badge badge-yes">Yes</span></td>
+                    <td><span class="badge badge-neutral">Neutral</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const rows = Array.from(document.querySelectorAll('#tbody tr'));
+        const searchInput = document.getElementById('search');
+        const visaFilter = document.getElementById('filter-visa');
+        const jobsFilter = document.getElementById('filter-jobs');
+        const rowCount = document.getElementById('row-count');
+        let sortCol = 'jobs';
+        let sortDir = -1; // -1 = desc, 1 = asc
+
+        function applyFilters() {
+            const term = searchInput.value.toLowerCase().trim();
+            let count = 0;
+            rows.forEach(row => {
+                const name = row.dataset.name;
+                const industry = row.dataset.industry;
+                const visa = row.dataset.visa;
+                const jobs = parseInt(row.dataset.jobs, 10);
+                let show = true;
+                if (term && !name.includes(term) && !industry.includes(term)) show = false;
+                if (visaFilter.checked && visa === 'no') show = false;
+                if (jobsFilter.checked && jobs === 0) show = false;
+                row.style.display = show ? '' : 'none';
+                if (show) count++;
+            });
+            rowCount.textContent = count;
+        }
+
+        function sortTable(col) {
+            if (sortCol === col) {
+                sortDir *= -1;
+            } else {
+                sortCol = col;
+                sortDir = col === 'jobs' || col === 'greatfit' ? -1 : 1;
+            }
+
+            // Update header classes
+            document.querySelectorAll('thead th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.col === col) {
+                    th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+                }
+            });
+
+            const tbody = document.getElementById('tbody');
+            const sorted = [...rows].sort((a, b) => {
+                let av = a.dataset[col] || '';
+                let bv = b.dataset[col] || '';
+                if (col === 'jobs' || col === 'greatfit') {
+                    return (parseInt(av,10) - parseInt(bv,10)) * sortDir;
+                }
+                return av.localeCompare(bv) * sortDir;
+            });
+            sorted.forEach(r => tbody.appendChild(r));
+            applyFilters();
+        }
+
+        document.querySelectorAll('thead th[data-col]').forEach(th => {
+            th.addEventListener('click', () => sortTable(th.dataset.col));
+        });
+        searchInput.addEventListener('input', applyFilters);
+        visaFilter.addEventListener('change', applyFilters);
+        jobsFilter.addEventListener('change', applyFilters);
+    </script>
+</body>
+</html>

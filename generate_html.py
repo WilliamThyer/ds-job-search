@@ -11,6 +11,7 @@ import sqlite3
 
 COMPANIES_FILE = Path(__file__).parent / "data" / "companies.json"
 OUTPUT_FILE = Path(__file__).parent / "docs" / "index.html"
+COMPANIES_OUTPUT_FILE = Path(__file__).parent / "docs" / "companies.html"
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -28,6 +29,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             background: #f5f5f5;
         }}
         h1 {{ color: #333; }}
+        .nav {{ margin-bottom: 20px; }}
+        .nav a {{
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 8px;
+        }}
+        .nav a:hover {{ background: #f0f0f0; }}
+        .nav a.active {{ background: #0066cc; color: white; }}
         .updated {{ color: #666; font-size: 14px; margin-bottom: 20px; }}
         .filters {{
             background: white;
@@ -187,6 +202,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
     <h1>Barcelona Data Science Jobs</h1>
+    <div class="nav">
+        <a href="index.html" class="active">Jobs</a>
+        <a href="companies.html">Companies</a>
+    </div>
     <p class="updated">Last updated: {updated}</p>
 
     <div class="stats">
@@ -277,6 +296,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const sortSelect = document.getElementById('sort-by');
         const visibleCount = document.getElementById('visible-count');
         const jobsContainer = document.getElementById('jobs');
+
+        // Apply URL params on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramCompany = urlParams.get('company');
+        if (paramCompany) {{
+            companySelect.value = paramCompany;
+            visaCheckbox.checked = false;
+            filterJobs();
+        }}
 
         searchInput.addEventListener('input', filterJobs);
         visaCheckbox.addEventListener('change', filterJobs);
@@ -520,7 +548,302 @@ def generate_html():
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_FILE.write_text(html)
     print(f"Generated {OUTPUT_FILE} with {len(jobs_html)} Barcelona jobs")
+
+    generate_companies_html(jobs, companies)
+
     return len(jobs_html), new_today
+
+
+COMPANIES_PAGE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcelona DS Jobs - Companies</title>
+    <style>
+        * {{ box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }}
+        h1 {{ color: #333; }}
+        .nav {{ margin-bottom: 20px; }}
+        .nav a {{
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 8px;
+        }}
+        .nav a:hover {{ background: #f0f0f0; }}
+        .nav a.active {{ background: #0066cc; color: white; }}
+        .updated {{ color: #666; font-size: 14px; margin-bottom: 20px; }}
+        .table-wrap {{
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: auto;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }}
+        thead th {{
+            background: #f8f9fa;
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }}
+        thead th:hover {{ background: #e9ecef; }}
+        thead th.sort-asc::after {{ content: " ▲"; font-size: 10px; }}
+        thead th.sort-desc::after {{ content: " ▼"; font-size: 10px; }}
+        tbody tr:nth-child(even) {{ background: #fafafa; }}
+        tbody tr:hover {{ background: #f0f4ff; }}
+        td {{ padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }}
+        td a {{ color: #0066cc; text-decoration: none; }}
+        td a:hover {{ text-decoration: underline; }}
+        .badge {{
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }}
+        .badge-yes {{ background: #d4edda; color: #155724; }}
+        .badge-likely {{ background: #cce5ff; color: #004085; }}
+        .badge-no {{ background: #f8d7da; color: #721c24; }}
+        .badge-unknown {{ background: #e9ecef; color: #495057; }}
+        .badge-good {{ background: #d4edda; color: #155724; }}
+        .badge-neutral {{ background: #e9ecef; color: #495057; }}
+        .badge-kinda_evil {{ background: #f8d7da; color: #721c24; }}
+        .jobs-count {{
+            font-weight: 600;
+            color: #0066cc;
+        }}
+        .jobs-zero {{ color: #aaa; }}
+        .filters {{
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }}
+        .filters label {{ font-weight: 500; color: #555; }}
+        .filters input[type="text"] {{
+            padding: 7px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 220px;
+        }}
+        .filters input[type="checkbox"] {{ margin: 0 4px 0 0; }}
+        .row-count {{ color: #666; font-size: 13px; margin-left: auto; }}
+    </style>
+</head>
+<body>
+    <h1>Barcelona Data Science Jobs</h1>
+    <div class="nav">
+        <a href="index.html">Jobs</a>
+        <a href="companies.html" class="active">Companies</a>
+    </div>
+    <p class="updated">Last updated: {updated} &mdash; {total_companies} companies tracked</p>
+
+    <div class="filters">
+        <label>Search: <input type="text" id="search" placeholder="Company or industry..."></label>
+        <label><input type="checkbox" id="filter-visa"> Visa sponsors only</label>
+        <label><input type="checkbox" id="filter-jobs"> Has open jobs only</label>
+        <span class="row-count"><span id="row-count">{total_companies}</span> companies shown</span>
+    </div>
+
+    <div class="table-wrap">
+        <table id="company-table">
+            <thead>
+                <tr>
+                    <th data-col="name">Company</th>
+                    <th data-col="industry">Industry</th>
+                    <th data-col="hq">HQ</th>
+                    <th data-col="jobs" class="sort-desc">Open Jobs</th>
+                    <th data-col="greatfit">Great Fit</th>
+                    <th data-col="visa">Visa</th>
+                    <th data-col="ethics">Ethics</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+{rows}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const rows = Array.from(document.querySelectorAll('#tbody tr'));
+        const searchInput = document.getElementById('search');
+        const visaFilter = document.getElementById('filter-visa');
+        const jobsFilter = document.getElementById('filter-jobs');
+        const rowCount = document.getElementById('row-count');
+        let sortCol = 'jobs';
+        let sortDir = -1; // -1 = desc, 1 = asc
+
+        function applyFilters() {{
+            const term = searchInput.value.toLowerCase().trim();
+            let count = 0;
+            rows.forEach(row => {{
+                const name = row.dataset.name;
+                const industry = row.dataset.industry;
+                const visa = row.dataset.visa;
+                const jobs = parseInt(row.dataset.jobs, 10);
+                let show = true;
+                if (term && !name.includes(term) && !industry.includes(term)) show = false;
+                if (visaFilter.checked && visa === 'no') show = false;
+                if (jobsFilter.checked && jobs === 0) show = false;
+                row.style.display = show ? '' : 'none';
+                if (show) count++;
+            }});
+            rowCount.textContent = count;
+        }}
+
+        function sortTable(col) {{
+            if (sortCol === col) {{
+                sortDir *= -1;
+            }} else {{
+                sortCol = col;
+                sortDir = col === 'jobs' || col === 'greatfit' ? -1 : 1;
+            }}
+
+            // Update header classes
+            document.querySelectorAll('thead th').forEach(th => {{
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.col === col) {{
+                    th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+                }}
+            }});
+
+            const tbody = document.getElementById('tbody');
+            const sorted = [...rows].sort((a, b) => {{
+                let av = a.dataset[col] || '';
+                let bv = b.dataset[col] || '';
+                if (col === 'jobs' || col === 'greatfit') {{
+                    return (parseInt(av,10) - parseInt(bv,10)) * sortDir;
+                }}
+                return av.localeCompare(bv) * sortDir;
+            }});
+            sorted.forEach(r => tbody.appendChild(r));
+            applyFilters();
+        }}
+
+        document.querySelectorAll('thead th[data-col]').forEach(th => {{
+            th.addEventListener('click', () => sortTable(th.dataset.col));
+        }});
+        searchInput.addEventListener('input', applyFilters);
+        visaFilter.addEventListener('change', applyFilters);
+        jobsFilter.addEventListener('change', applyFilters);
+    </script>
+</body>
+</html>
+"""
+
+COMPANY_ROW_TEMPLATE = """                <tr data-name="{name_lower}" data-industry="{industry_lower}" data-visa="{visa_data}" data-jobs="{job_count}" data-greatfit="{greatfit_count}">
+                    <td><a href="{careers_url}" target="_blank">{name}</a></td>
+                    <td>{industry}</td>
+                    <td>{hq}</td>
+                    <td>{jobs_cell}</td>
+                    <td>{greatfit_cell}</td>
+                    <td><span class="badge badge-{visa_class}">{visa_label}</span></td>
+                    <td><span class="badge badge-{ethics}">{ethics_label}</span></td>
+                </tr>"""
+
+
+def generate_companies_html(jobs: list[dict], companies: dict):
+    """Generate the companies overview page."""
+    # Count jobs and great fits per company
+    company_job_counts: dict[str, int] = {}
+    company_greatfit_counts: dict[str, int] = {}
+
+    for job in jobs:
+        location = (job['location'] or '').lower()
+        if 'barcelona' not in location and 'spain' not in location and 'bcn' not in location:
+            continue
+        cid = job['company_id']
+        company_job_counts[cid] = company_job_counts.get(cid, 0) + 1
+        if is_great_fit(job['job_title'], job.get('description_full') or ''):
+            company_greatfit_counts[cid] = company_greatfit_counts.get(cid, 0) + 1
+
+    rows = []
+    for cid, info in sorted(companies.items(), key=lambda x: x[1].get('name', x[0]).lower()):
+        name = info.get('name', cid)
+        industry = info.get('industry', '')
+        hq = info.get('headquarters', '')
+        careers_url = info.get('careers_url', '#')
+        ethics = info.get('ethics_rating', 'neutral')
+        ethics_label = {'good': 'Good', 'neutral': 'Neutral', 'kinda_evil': 'Caution'}.get(ethics, ethics)
+        known_sponsor = info.get('known_visa_sponsor', False)
+
+        job_count = company_job_counts.get(cid, 0)
+        greatfit_count = company_greatfit_counts.get(cid, 0)
+
+        # Visa classification
+        if known_sponsor:
+            visa_data = 'yes'
+            visa_class = 'yes'
+            visa_label = 'Yes'
+        elif known_sponsor is False:
+            visa_data = 'no'
+            visa_class = 'no'
+            visa_label = 'No'
+        else:
+            visa_data = 'unknown'
+            visa_class = 'unknown'
+            visa_label = 'Unknown'
+
+        # Jobs cell with link
+        if job_count > 0:
+            jobs_cell = f'<a class="jobs-count" href="index.html?company={cid}">{job_count}</a>'
+        else:
+            jobs_cell = '<span class="jobs-zero">0</span>'
+
+        greatfit_cell = f'<span class="jobs-count">{greatfit_count}</span>' if greatfit_count > 0 else '<span class="jobs-zero">0</span>'
+
+        rows.append(COMPANY_ROW_TEMPLATE.format(
+            name=name,
+            name_lower=name.lower(),
+            industry=industry,
+            industry_lower=industry.lower(),
+            hq=hq,
+            careers_url=careers_url,
+            job_count=job_count,
+            greatfit_count=greatfit_count,
+            jobs_cell=jobs_cell,
+            greatfit_cell=greatfit_cell,
+            visa_data=visa_data,
+            visa_class=visa_class,
+            visa_label=visa_label,
+            ethics=ethics,
+            ethics_label=ethics_label,
+        ))
+
+    html = COMPANIES_PAGE_TEMPLATE.format(
+        updated=datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
+        total_companies=len(companies),
+        rows='\n'.join(rows),
+    )
+
+    COMPANIES_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    COMPANIES_OUTPUT_FILE.write_text(html)
+    print(f"Generated {COMPANIES_OUTPUT_FILE} with {len(companies)} companies")
 
 
 if __name__ == "__main__":
