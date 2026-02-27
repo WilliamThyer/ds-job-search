@@ -49,6 +49,22 @@
       "notes": "Design-focused culture"
     },
     {
+      "id": "keysight",
+      "name": "Keysight Technologies",
+      "headquarters": "Santa Rosa",
+      "website": "https://keysight.com",
+      "careers_url": "https://jobs.keysight.com/external?q=data+machine+learning&location=Barcelona",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Electronic Test & Measurement / AI",
+      "employee_count": "14000+",
+      "ethics_rating": "good",
+      "ethics_notes": "Test and measurement equipment, 6G and quantum research",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Central AI Hub in BCN. Applied Scientist roles for 6G, quantum, and semiconductor ML. Jibe/TalentPlatform ATS."
+    },
+    {
       "id": "king",
       "name": "King (Activision Blizzard)",
       "headquarters": "Stockholm",
@@ -143,6 +159,22 @@
       "languages": ["English"],
       "known_visa_sponsor": true,
       "notes": "B2B delivery platform, Barcelona tech hub"
+    },
+    {
+      "id": "pepsico",
+      "name": "PepsiCo",
+      "headquarters": "Purchase",
+      "website": "https://pepsico.com",
+      "careers_url": "https://www.pepsicojobs.com/main/jobs?location=Barcelona&stretch=10&stretchUnit=MILES",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Consumer Goods / Food & Beverage",
+      "employee_count": "300000+",
+      "ethics_rating": "neutral",
+      "ethics_notes": "Global food and beverage giant",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Global Digital Hub in BCN for supply chain AI. Jan 2026: NVIDIA/Siemens partnership for Digital Twins and Agentic AI. Jibe/TalentPlatform ATS."
     },
     {
       "id": "preply",
@@ -337,6 +369,22 @@
       "notes": "Barcelona office, aggressive hiring in data/ML. Manual check required."
     },
     {
+      "id": "nestle",
+      "name": "Nestlé",
+      "headquarters": "Vevey",
+      "website": "https://nestle.com",
+      "careers_url": "https://www.nestle.com/jobs/search-jobs?location=Barcelona&category=IT+%26+Digital",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Consumer Goods / Food & Beverage",
+      "employee_count": "270000+",
+      "ethics_rating": "neutral",
+      "ethics_notes": "Major consumer goods, sustainability mixed record",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Global IT/Digital Hub in Esplugues (just outside BCN). Industry 4.0 and Supply Chain ML. SAP SuccessFactors ATS."
+    },
+    {
       "id": "n26",
       "name": "N26",
       "headquarters": "Berlin",
@@ -415,6 +463,22 @@
       "languages": ["English"],
       "known_visa_sponsor": true,
       "notes": "Barcelona is their European hub"
+    },
+    {
+      "id": "sanofi",
+      "name": "Sanofi",
+      "headquarters": "Paris",
+      "website": "https://sanofi.com",
+      "careers_url": "https://jobs.sanofi.com/en/search-jobs/barcelona",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Pharmaceuticals / AI",
+      "employee_count": "80000+",
+      "ethics_rating": "good",
+      "ethics_notes": "Major pharma with AI Excellence Centre in BCN",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "AI Global Excellence Centre in BCN. AI/ML for Drug Design and Computational Science. 25+ digital/AI roles typically open. Radancy ATS."
     },
     {
       "id": "sap",
@@ -511,6 +575,38 @@
       "languages": ["English", "Spanish"],
       "known_visa_sponsor": true,
       "notes": "Supercomputing research center, climate/health DS"
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "headquarters": "Cupertino",
+      "website": "https://apple.com",
+      "careers_url": "https://jobs.apple.com/en-us/search?location=barcelona-ESP",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Technology / Consumer Electronics",
+      "employee_count": "160000+",
+      "ethics_rating": "neutral",
+      "ethics_notes": "Strong privacy stance, supply chain concerns",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "BCN office focuses on NLP, Siri, and ML Tools. Custom in-house ATS. Very high bar."
+    },
+    {
+      "id": "astrazeneca",
+      "name": "AstraZeneca / Evinova",
+      "headquarters": "Cambridge",
+      "website": "https://astrazeneca.com",
+      "careers_url": "https://careers.astrazeneca.com/search-jobs/barcelona",
+      "ats_platform": "manual",
+      "ats_id": "",
+      "industry": "Pharmaceuticals / Health Tech",
+      "employee_count": "80000+",
+      "ethics_rating": "good",
+      "ethics_notes": "Major pharma, Evinova is AI-native health-tech spin-out",
+      "languages": ["English"],
+      "known_visa_sponsor": true,
+      "notes": "Evinova (health-tech spinout) is based in BCN. Hires Principal ML Engineers and Statistical Scientists. TalentBrew ATS."
     },
     {
       "id": "clarivate",
