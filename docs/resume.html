@@ -175,15 +175,14 @@
 
 ` : '';
         const jdSection = jd ? jd : '[PASTE JOB DESCRIPTION HERE]';
-        return `${roleHeader}Tailor my resume for this job description. Output the final resume markdown only — no commentary, no explanation.
+        return `${roleHeader}Tailor my resume for this job description. Output the final resume markdown only — no commentary, no explanation. Make sure to use the exact formatting of the provided resume.
 
 Rules:
 - Use my current resume as the base structure and formatting (preserve all span/iconify tags exactly)
 - You may swap in better-fit bullets from the work history JSON, but only use bullets that exist there — never fabricate metrics, technologies, or claims
 - Lightly reword bullets to mirror JD keywords where truthful
 - Keep to one page: 6-7 bullets for Cohere Health, 1 each for the other roles
-- Write a 2-sentence summary tailored to this role
-- Reorder the Skills section to front-load the most JD-relevant items
+- Reorder the Skills section to front-load the most JD-relevant items, never make up skills
 - Mirror ATS keywords from the JD naturally in the text
 - Lead with impact and quantified results wherever possible
 
