@@ -4,14 +4,17 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 from models import DB_PATH
 from utils import is_great_fit
 import sqlite3
 
 COMPANIES_FILE = Path(__file__).parent / "data" / "companies.json"
+WORK_HISTORY_FILE = Path(__file__).parent / "data" / "master_work_history.json"
 OUTPUT_FILE = Path(__file__).parent / "docs" / "index.html"
 COMPANIES_OUTPUT_FILE = Path(__file__).parent / "docs" / "companies.html"
+RESUME_OUTPUT_FILE = Path(__file__).parent / "docs" / "resume.html"
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -154,6 +157,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             font-size: 11px;
             margin-left: 8px;
         }}
+        .btn-resume {{
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 12px;
+            background: #f0f4ff;
+            border: 1px solid #c0d0f0;
+            border-radius: 6px;
+            color: #0066cc;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }}
+        .btn-resume:hover {{ background: #dde8ff; }}
         .manual-section {{
             margin-top: 40px;
             padding-top: 20px;
@@ -205,6 +221,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="nav">
         <a href="index.html" class="active">Jobs</a>
         <a href="companies.html">Companies</a>
+        <a href="resume.html">Resume Builder</a>
     </div>
     <p class="updated">Last updated: {updated}</p>
 
@@ -392,6 +409,7 @@ JOB_CARD_TEMPLATE = """
         <span class="tag tag-{visa_class}">{visa_status}</span>
         <span class="tag tag-ethics-{ethics}">{ethics_label}</span>
     </div>
+    <a class="btn-resume" href="resume.html?title={title_enc}&company={company_enc}&url={url_enc}" target="_blank">Generate Resume</a>
 </div>
 """
 
@@ -515,10 +533,13 @@ def generate_html():
         jobs_html.append(JOB_CARD_TEMPLATE.format(
             title=job['job_title'],
             title_lower=job['job_title'].lower(),
+            title_enc=quote(job['job_title']),
             url=job['job_url'],
+            url_enc=quote(job['job_url'], safe=''),
             company=company_name,
             company_id=job['company_id'],
             company_lower=company_name.lower(),
+            company_enc=quote(company_name),
             location=job['location'] or 'Barcelona',
             posted_date=job['posted_date'] or 'Unknown',
             posted_sort=posted_sort,
@@ -550,6 +571,7 @@ def generate_html():
     print(f"Generated {OUTPUT_FILE} with {len(jobs_html)} Barcelona jobs")
 
     generate_companies_html(jobs, companies)
+    generate_resume_html()
 
     return len(jobs_html), new_today
 
@@ -660,6 +682,7 @@ COMPANIES_PAGE_TEMPLATE = """<!DOCTYPE html>
     <div class="nav">
         <a href="index.html">Jobs</a>
         <a href="companies.html" class="active">Companies</a>
+        <a href="resume.html">Resume Builder</a>
     </div>
     <p class="updated">Last updated: {updated} &mdash; {total_companies} companies tracked</p>
 
@@ -844,6 +867,294 @@ def generate_companies_html(jobs: list[dict], companies: dict):
     COMPANIES_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     COMPANIES_OUTPUT_FILE.write_text(html)
     print(f"Generated {COMPANIES_OUTPUT_FILE} with {len(companies)} companies")
+
+
+RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcelona DS Jobs - Resume Builder</title>
+    <style>
+        * {{ box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }}
+        h1 {{ color: #333; }}
+        .nav {{ margin-bottom: 20px; }}
+        .nav a {{
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 8px;
+        }}
+        .nav a:hover {{ background: #f0f0f0; }}
+        .nav a.active {{ background: #0066cc; color: white; }}
+        .card {{
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }}
+        .card h2 {{ margin-top: 0; color: #333; font-size: 18px; }}
+        label {{ display: block; font-weight: 500; color: #555; margin-bottom: 6px; }}
+        .job-info {{ display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }}
+        .job-info input {{
+            flex: 1;
+            min-width: 180px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }}
+        textarea {{
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }}
+        textarea#jd-input {{ height: 220px; }}
+        textarea#prompt-output {{
+            height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #f8f9fa;
+        }}
+        .btn {{
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }}
+        .btn-primary {{ background: #0066cc; color: white; }}
+        .btn-primary:hover {{ background: #0052a3; }}
+        .btn-copy {{ background: #28a745; color: white; margin-left: 10px; }}
+        .btn-copy:hover {{ background: #218838; }}
+        .btn-copy.copied {{ background: #6c757d; }}
+        .output-header {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }}
+        .output-header h2 {{ margin: 0; font-size: 18px; color: #333; }}
+        .hint {{ color: #888; font-size: 13px; margin-top: 8px; }}
+        .hidden {{ display: none; }}
+    </style>
+</head>
+<body>
+    <h1>Barcelona Data Science Jobs</h1>
+    <div class="nav">
+        <a href="index.html">Jobs</a>
+        <a href="companies.html">Companies</a>
+        <a href="resume.html" class="active">Resume Builder</a>
+    </div>
+
+    <div class="card">
+        <h2>Generate Tailored Resume Prompt</h2>
+        <p style="color:#555; margin-top:0;">Paste a job description below and click <strong>Generate Prompt</strong>.
+        Copy the result into <a href="https://claude.ai" target="_blank">Claude.ai</a> to get a tailored one-page resume.</p>
+
+        <div class="job-info">
+            <div style="flex:1; min-width:180px;">
+                <label for="job-title">Job Title (optional)</label>
+                <input type="text" id="job-title" placeholder="e.g. Senior Data Scientist">
+            </div>
+            <div style="flex:1; min-width:180px;">
+                <label for="job-company">Company (optional)</label>
+                <input type="text" id="job-company" placeholder="e.g. Stripe">
+            </div>
+        </div>
+
+        <label for="jd-input">Job Description</label>
+        <textarea id="jd-input" placeholder="Paste the full job description here..."></textarea>
+
+        <div style="margin-top: 14px;">
+            <button class="btn btn-primary" onclick="generatePrompt()">Generate Prompt</button>
+        </div>
+    </div>
+
+    <div class="card hidden" id="output-card">
+        <div class="output-header">
+            <h2>Your Claude Prompt</h2>
+            <button class="btn btn-copy" id="copy-btn" onclick="copyPrompt()">Copy to Clipboard</button>
+        </div>
+        <textarea id="prompt-output" readonly></textarea>
+        <p class="hint">Open <a href="https://claude.ai" target="_blank">claude.ai</a>, start a new chat, and paste this prompt.</p>
+    </div>
+
+    <script>
+    const WORK_HISTORY = {work_history_json};
+
+    // Pre-fill from URL params (when linked from a job card)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('title')) document.getElementById('job-title').value = params.get('title');
+    if (params.get('company')) document.getElementById('job-company').value = params.get('company');
+
+    function generatePrompt() {{
+        const jd = document.getElementById('jd-input').value.trim();
+        if (!jd) {{ alert('Please paste a job description first.'); return; }}
+
+        const title = document.getElementById('job-title').value.trim();
+        const company = document.getElementById('job-company').value.trim();
+        const jobLine = [title, company].filter(Boolean).join(' at ');
+
+        const prompt = buildPrompt(jd, jobLine);
+        document.getElementById('prompt-output').value = prompt;
+        document.getElementById('output-card').classList.remove('hidden');
+        document.getElementById('copy-btn').textContent = 'Copy to Clipboard';
+        document.getElementById('copy-btn').classList.remove('copied');
+        document.getElementById('output-card').scrollIntoView({{behavior: 'smooth'}});
+    }}
+
+    function copyPrompt() {{
+        const ta = document.getElementById('prompt-output');
+        ta.select();
+        navigator.clipboard.writeText(ta.value).then(() => {{
+            const btn = document.getElementById('copy-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {{
+                btn.textContent = 'Copy to Clipboard';
+                btn.classList.remove('copied');
+            }}, 2000);
+        }});
+    }}
+
+    function buildPrompt(jd, jobLine) {{
+        const wh = JSON.stringify(WORK_HISTORY, null, 2);
+        const header = jobLine ? `Role: ${{jobLine}}\\n\\n` : '';
+
+        return `You are an expert resume writer. Tailor my resume for this job.
+
+${{header}}## INSTRUCTIONS
+
+1. Analyze the JD: extract required skills, preferred skills, key responsibilities, domain keywords, seniority level, and role emphasis (LLM/AI, ML engineering, data engineering, analytics, leadership, healthcare — score 0-10 each).
+
+2. Select and tailor bullets:
+   - Choose 6-7 bullets from my Cohere Health experience weighted by role emphasis scores
+   - Choose 1 bullet for University of Chicago
+   - Choose 1 bullet for Intuitive Surgical
+   - Choose 1 bullet for Spark Neuro
+   - You may lightly reword bullets to mirror JD keywords — but NEVER add metrics, technologies, or claims not in the source JSON
+   - NEVER fabricate anything
+
+3. Write a 2-sentence professional summary tailored to this specific role.
+
+4. Reorder the skills section to front-load JD-relevant skills.
+
+## OUTPUT FORMAT
+
+Return the final resume as markdown using exactly this structure (preserve the span/iconify tags):
+
+---
+---
+
+# William Thyer, PhD
+
+<span class="iconify" data-icon="charm:person"></span> [williamthyer.com](https://williamthyer.com/)
+  : <span class="iconify" data-icon="tabler:brand-github"></span> [github.com/WilliamThyer](https://github.com/WilliamThyer)
+  : <span class="iconify" data-icon="tabler:phone"></span> [(850) 510-4151](tel:+18505104151)
+
+<span class="iconify" data-icon="tabler:brand-linkedin"></span> [linkedin.com/in/williamthyer](https://www.linkedin.com/in/williamthyer/)
+  : <span class="iconify" data-icon="tabler:mail"></span> [williamthyer@proton.me](mailto:williamthyer@proton.me)
+
+## Summary
+[2-sentence summary here]
+
+## Experience
+
+**Senior Data Scientist** *(formerly Data Scientist I, II)*
+  : **Cohere Health**
+  : **Aug 2023 - Present**
+
+[6-7 selected/tailored bullets]
+
+**Doctoral Researcher**
+  : **University of Chicago**
+  : **Jul 2018 - Jul 2023**
+
+[1 bullet]
+
+**Data Scientist Intern**
+  : **Intuitive Surgical**
+  : **Jun 2022 - Sep 2022**
+
+[1 bullet]
+
+**Data Scientist Intern**
+  : **Spark Neuro**
+  : **Jul 2021 - Dec 2021**
+
+[1 bullet]
+
+## Education
+
+**PhD Integrative Neuroscience, Psychology**
+  : **2023**
+
+University of Chicago, Institute for Mind and Biology
+  : Chicago, IL
+
+**BS Psychology, Minor in Statistics**
+  : **2017**
+
+Florida State University
+  : Tallahassee, FL
+
+## Skills
+
+**ML/AI:** [reordered to front-load JD matches]
+
+**Data Engineering:** <span class="iconify" data-icon="vscode-icons:file-type-python"></span> Python, <span class="iconify" data-icon="devicon-plain:azuresqldatabase"></span> SQL, [rest of data eng skills]
+
+**Cloud/Infrastructure:** <span class="iconify" data-icon="logos:aws"></span> AWS (Lambda, S3, Bedrock, CloudWatch), [rest of cloud skills]
+
+**Visualization/Other:** [reordered]
+
+---
+
+## MY WORK HISTORY JSON
+
+${{wh}}
+
+---
+
+## JOB DESCRIPTION
+
+${{jd}}`;
+    }}
+    </script>
+</body>
+</html>
+"""
+
+
+def generate_resume_html():
+    work_history = json.loads(WORK_HISTORY_FILE.read_text())
+    # Compact JSON for embedding (pretty enough to be readable by Claude)
+    work_history_json = json.dumps(work_history, indent=2)
+    # Escape for JS string embedding (handled by putting it in a const assignment, not a string)
+
+    html = RESUME_PAGE_TEMPLATE.format(work_history_json=work_history_json)
+    RESUME_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    RESUME_OUTPUT_FILE.write_text(html)
+    print(f"Generated {RESUME_OUTPUT_FILE}")
 
 
 if __name__ == "__main__":
