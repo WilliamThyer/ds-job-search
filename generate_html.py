@@ -12,6 +12,7 @@ import sqlite3
 
 COMPANIES_FILE = Path(__file__).parent / "data" / "companies.json"
 WORK_HISTORY_FILE = Path(__file__).parent / "data" / "master_work_history.json"
+RESUME_TEMPLATE_FILE = Path(__file__).parent / "data" / "my_resume.md"
 OUTPUT_FILE = Path(__file__).parent / "docs" / "index.html"
 COMPANIES_OUTPUT_FILE = Path(__file__).parent / "docs" / "companies.html"
 RESUME_OUTPUT_FILE = Path(__file__).parent / "docs" / "resume.html"
@@ -999,7 +1000,8 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <script>
-    const WORK_HISTORY = {work_history_json};
+    const RESUME_TEMPLATE = {resume_template_js};
+    const WORK_HISTORY_JSON = {work_history_js};
 
     // Pre-fill from URL params (when linked from a job card)
     const params = new URLSearchParams(window.location.search);
@@ -1037,103 +1039,26 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
     }}
 
     function buildPrompt(jd, jobLine) {{
-        const wh = JSON.stringify(WORK_HISTORY, null, 2);
-        const header = jobLine ? `Role: ${{jobLine}}\\n\\n` : '';
+        const roleHeader = jobLine ? `Role: ${{jobLine}}\n\n` : '';
+        return `${{roleHeader}}Tailor my resume for this job description. Output the final resume markdown only — no commentary, no explanation.
 
-        return `You are an expert resume writer. Tailor my resume for this job.
+Rules:
+- Use my current resume as the base structure and formatting (preserve all span/iconify tags exactly)
+- You may swap in better-fit bullets from the work history JSON, but only use bullets that exist there — never fabricate metrics, technologies, or claims
+- Lightly reword bullets to mirror JD keywords where truthful
+- Keep to one page: 6-7 bullets for Cohere Health, 1 each for the other roles
+- Write a 2-sentence summary tailored to this role
+- Reorder the Skills section to front-load the most JD-relevant items
+- Mirror ATS keywords from the JD naturally in the text
+- Lead with impact and quantified results wherever possible
 
-${{header}}## INSTRUCTIONS
+## MY CURRENT RESUME
 
-1. Analyze the JD: extract required skills, preferred skills, key responsibilities, domain keywords, seniority level, and role emphasis (LLM/AI, ML engineering, data engineering, analytics, leadership, healthcare — score 0-10 each).
+${{RESUME_TEMPLATE}}
 
-2. Select and tailor bullets:
-   - Choose 6-7 bullets from my Cohere Health experience weighted by role emphasis scores
-   - Choose 1 bullet for University of Chicago
-   - Choose 1 bullet for Intuitive Surgical
-   - Choose 1 bullet for Spark Neuro
-   - You may lightly reword bullets to mirror JD keywords — but NEVER add metrics, technologies, or claims not in the source JSON
-   - NEVER fabricate anything
+## FULL WORK HISTORY (additional bullets to draw from)
 
-3. Write a 2-sentence professional summary tailored to this specific role.
-
-4. Reorder the skills section to front-load JD-relevant skills.
-
-## OUTPUT FORMAT
-
-Return the final resume as markdown using exactly this structure (preserve the span/iconify tags):
-
----
----
-
-# William Thyer, PhD
-
-<span class="iconify" data-icon="charm:person"></span> [williamthyer.com](https://williamthyer.com/)
-  : <span class="iconify" data-icon="tabler:brand-github"></span> [github.com/WilliamThyer](https://github.com/WilliamThyer)
-  : <span class="iconify" data-icon="tabler:phone"></span> [(850) 510-4151](tel:+18505104151)
-
-<span class="iconify" data-icon="tabler:brand-linkedin"></span> [linkedin.com/in/williamthyer](https://www.linkedin.com/in/williamthyer/)
-  : <span class="iconify" data-icon="tabler:mail"></span> [williamthyer@proton.me](mailto:williamthyer@proton.me)
-
-## Summary
-[2-sentence summary here]
-
-## Experience
-
-**Senior Data Scientist** *(formerly Data Scientist I, II)*
-  : **Cohere Health**
-  : **Aug 2023 - Present**
-
-[6-7 selected/tailored bullets]
-
-**Doctoral Researcher**
-  : **University of Chicago**
-  : **Jul 2018 - Jul 2023**
-
-[1 bullet]
-
-**Data Scientist Intern**
-  : **Intuitive Surgical**
-  : **Jun 2022 - Sep 2022**
-
-[1 bullet]
-
-**Data Scientist Intern**
-  : **Spark Neuro**
-  : **Jul 2021 - Dec 2021**
-
-[1 bullet]
-
-## Education
-
-**PhD Integrative Neuroscience, Psychology**
-  : **2023**
-
-University of Chicago, Institute for Mind and Biology
-  : Chicago, IL
-
-**BS Psychology, Minor in Statistics**
-  : **2017**
-
-Florida State University
-  : Tallahassee, FL
-
-## Skills
-
-**ML/AI:** [reordered to front-load JD matches]
-
-**Data Engineering:** <span class="iconify" data-icon="vscode-icons:file-type-python"></span> Python, <span class="iconify" data-icon="devicon-plain:azuresqldatabase"></span> SQL, [rest of data eng skills]
-
-**Cloud/Infrastructure:** <span class="iconify" data-icon="logos:aws"></span> AWS (Lambda, S3, Bedrock, CloudWatch), [rest of cloud skills]
-
-**Visualization/Other:** [reordered]
-
----
-
-## MY WORK HISTORY JSON
-
-${{wh}}
-
----
+${{WORK_HISTORY_JSON}}
 
 ## JOB DESCRIPTION
 
@@ -1146,12 +1071,17 @@ ${{jd}}`;
 
 
 def generate_resume_html():
-    work_history = json.loads(WORK_HISTORY_FILE.read_text())
-    # Compact JSON for embedding (pretty enough to be readable by Claude)
-    work_history_json = json.dumps(work_history, indent=2)
-    # Escape for JS string embedding (handled by putting it in a const assignment, not a string)
+    resume_template = RESUME_TEMPLATE_FILE.read_text()
+    work_history = WORK_HISTORY_FILE.read_text()  # raw JSON string
 
-    html = RESUME_PAGE_TEMPLATE.format(work_history_json=work_history_json)
+    # json.dumps encodes both as safe JS string literals (handles quotes, newlines, etc.)
+    resume_template_js = json.dumps(resume_template)
+    work_history_js = json.dumps(work_history)
+
+    html = RESUME_PAGE_TEMPLATE.format(
+        resume_template_js=resume_template_js,
+        work_history_js=work_history_js,
+    )
     RESUME_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     RESUME_OUTPUT_FILE.write_text(html)
     print(f"Generated {RESUME_OUTPUT_FILE}")
