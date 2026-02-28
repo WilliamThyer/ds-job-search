@@ -1022,9 +1022,9 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
     const RESUME_TEMPLATE = {resume_template_js};
     const WORK_HISTORY_JSON = {work_history_js};
 
-    function generatePrompt() {{
+    function generatePrompt(fromJobCard = false) {{
         const jd = document.getElementById('jd-input').value.trim();
-        if (!jd) {{ alert('Please paste a job description first.'); return; }}
+        if (!jd && !fromJobCard) {{ alert('Please paste a job description first.'); return; }}
 
         const title = document.getElementById('job-title').value.trim();
         const company = document.getElementById('job-company').value.trim();
@@ -1036,6 +1036,15 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
         document.getElementById('copy-btn').textContent = 'Copy to Clipboard';
         document.getElementById('copy-btn').classList.remove('copied');
         document.getElementById('output-card').scrollIntoView({{behavior: 'smooth'}});
+
+        if (fromJobCard) {{
+            navigator.clipboard.writeText(prompt).then(() => {{
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {{ btn.textContent = 'Copy to Clipboard'; btn.classList.remove('copied'); }}, 2000);
+            }});
+        }}
     }}
 
     function copyPrompt() {{
@@ -1054,6 +1063,7 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
 
     function buildPrompt(jd, jobLine) {{
         const roleHeader = jobLine ? `Role: ${{jobLine}}\n\n` : '';
+        const jdSection = jd ? jd : '[PASTE JOB DESCRIPTION HERE]';
         return `${{roleHeader}}Tailor my resume for this job description. Output the final resume markdown only — no commentary, no explanation. Make sure to use the exact formatting of the provided resume.
 
 Rules:
@@ -1075,7 +1085,7 @@ ${{WORK_HISTORY_JSON}}
 
 ## JOB DESCRIPTION
 
-${{jd}}`;
+${{jdSection}}`;
     }}
 
     // Auto-fill and generate when launched from a job card
@@ -1085,10 +1095,8 @@ ${{jd}}`;
         const job = JSON.parse(storedJob);
         if (job.title) document.getElementById('job-title').value = job.title;
         if (job.company) document.getElementById('job-company').value = job.company;
-        if (job.description) {{
-            document.getElementById('jd-input').value = job.description;
-            generatePrompt();
-        }}
+        if (job.description) document.getElementById('jd-input').value = job.description;
+        generatePrompt(true);
     }}
     </script>
 </body>
