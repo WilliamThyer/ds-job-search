@@ -1074,6 +1074,8 @@ Rules:
 - Reorder the Skills section to front-load the most JD-relevant items, never make up skills
 - Mirror ATS keywords from the JD naturally in the text
 - Lead with impact and quantified results wherever possible
+- Always use my voice and style, and never use AI-sounding language buzzwords, or em-dashes/hyphens.
+- Before returning the resume, briefly analyze my fit for the role and explain in 1-2 sentences which parts of my experience are most relevant and which are less relevant, and why. This analysis should be concise and focused on the content of the resume and JD, not on generic advice.
 
 ## MY CURRENT RESUME
 
