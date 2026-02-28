@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Generate HTML dashboard for GitHub Pages."""
 
+import html
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
@@ -9,6 +11,14 @@ from urllib.parse import quote
 from models import DB_PATH
 from utils import is_great_fit
 import sqlite3
+
+def clean_description(text: str, max_len: int = 3000) -> str:
+    if not text:
+        return ''
+    text = re.sub(r'<[^>]+>', ' ', text)       # strip HTML tags
+    text = re.sub(r'\s+', ' ', text).strip()    # collapse whitespace
+    return text[:max_len]
+
 
 COMPANIES_FILE = Path(__file__).parent / "data" / "companies.json"
 WORK_HISTORY_FILE = Path(__file__).parent / "data" / "master_work_history.json"
@@ -395,13 +405,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             cards.forEach(card => jobsContainer.appendChild(card));
             filterJobs();
         }}
+
+        function openResumeBuilder(btn) {{
+            const card = btn.closest('.job-card');
+            const title = card.querySelector('h3 a').textContent;
+            const company = card.querySelector('.company').textContent;
+            const description = card.dataset.description || '';
+            sessionStorage.setItem('resumeJob', JSON.stringify({{title, company, description}}));
+            window.open('resume.html', '_blank');
+        }}
     </script>
 </body>
 </html>
 """
 
 JOB_CARD_TEMPLATE = """
-<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}" data-posted="{posted_sort}" data-scraped="{scraped_sort}" data-greatfit="{greatfit}">
+<div class="job-card" data-visa="{visa_data}" data-ethics="{ethics}" data-worktype="{worktype}" data-company="{company_id}" data-title="{title_lower}" data-companyname="{company_lower}" data-posted="{posted_sort}" data-scraped="{scraped_sort}" data-greatfit="{greatfit}" data-description="{description_attr}">
     <h3><a href="{url}" target="_blank">{title}</a>{new_badge}{greatfit_badge}</h3>
     <div class="company">{company}</div>
     <div class="meta">{location} · Posted: {posted_date} · Added: {scraped_date}</div>
@@ -410,7 +429,7 @@ JOB_CARD_TEMPLATE = """
         <span class="tag tag-{visa_class}">{visa_status}</span>
         <span class="tag tag-ethics-{ethics}">{ethics_label}</span>
     </div>
-    <a class="btn-resume" href="resume.html?title={title_enc}&company={company_enc}&url={url_enc}" target="_blank">Generate Resume</a>
+    <button class="btn-resume" onclick="openResumeBuilder(this)">Generate Resume</button>
 </div>
 """
 
@@ -531,16 +550,16 @@ def generate_html():
         great_fit = is_great_fit(job['job_title'], job.get('description_full') or '')
         greatfit_badge = '<span class="greatfit-badge">GREAT FIT</span>' if great_fit else ''
 
+        description_attr = html.escape(clean_description(job.get('description_full') or ''), quote=True)
+
         jobs_html.append(JOB_CARD_TEMPLATE.format(
             title=job['job_title'],
             title_lower=job['job_title'].lower(),
-            title_enc=quote(job['job_title']),
             url=job['job_url'],
-            url_enc=quote(job['job_url'], safe=''),
             company=company_name,
             company_id=job['company_id'],
             company_lower=company_name.lower(),
-            company_enc=quote(company_name),
+            description_attr=description_attr,
             location=job['location'] or 'Barcelona',
             posted_date=job['posted_date'] or 'Unknown',
             posted_sort=posted_sort,
@@ -558,7 +577,7 @@ def generate_html():
             greatfit_badge=greatfit_badge,
         ))
 
-    html = HTML_TEMPLATE.format(
+    page = HTML_TEMPLATE.format(
         updated=datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
         total_jobs=len(jobs_html),
         new_today=new_today,
@@ -568,7 +587,7 @@ def generate_html():
     )
 
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_FILE.write_text(html)
+    OUTPUT_FILE.write_text(page)
     print(f"Generated {OUTPUT_FILE} with {len(jobs_html)} Barcelona jobs")
 
     generate_companies_html(jobs, companies)
@@ -859,14 +878,14 @@ def generate_companies_html(jobs: list[dict], companies: dict):
             ethics_label=ethics_label,
         ))
 
-    html = COMPANIES_PAGE_TEMPLATE.format(
+    page = COMPANIES_PAGE_TEMPLATE.format(
         updated=datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
         total_companies=len(companies),
         rows='\n'.join(rows),
     )
 
     COMPANIES_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    COMPANIES_OUTPUT_FILE.write_text(html)
+    COMPANIES_OUTPUT_FILE.write_text(page)
     print(f"Generated {COMPANIES_OUTPUT_FILE} with {len(companies)} companies")
 
 
@@ -1003,11 +1022,6 @@ RESUME_PAGE_TEMPLATE = """<!DOCTYPE html>
     const RESUME_TEMPLATE = {resume_template_js};
     const WORK_HISTORY_JSON = {work_history_js};
 
-    // Pre-fill from URL params (when linked from a job card)
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('title')) document.getElementById('job-title').value = params.get('title');
-    if (params.get('company')) document.getElementById('job-company').value = params.get('company');
-
     function generatePrompt() {{
         const jd = document.getElementById('jd-input').value.trim();
         if (!jd) {{ alert('Please paste a job description first.'); return; }}
@@ -1064,6 +1078,19 @@ ${{WORK_HISTORY_JSON}}
 
 ${{jd}}`;
     }}
+
+    // Auto-fill and generate when launched from a job card
+    const storedJob = sessionStorage.getItem('resumeJob');
+    if (storedJob) {{
+        sessionStorage.removeItem('resumeJob');
+        const job = JSON.parse(storedJob);
+        if (job.title) document.getElementById('job-title').value = job.title;
+        if (job.company) document.getElementById('job-company').value = job.company;
+        if (job.description) {{
+            document.getElementById('jd-input').value = job.description;
+            generatePrompt();
+        }}
+    }}
     </script>
 </body>
 </html>
@@ -1078,12 +1105,12 @@ def generate_resume_html():
     resume_template_js = json.dumps(resume_template)
     work_history_js = json.dumps(work_history)
 
-    html = RESUME_PAGE_TEMPLATE.format(
+    page = RESUME_PAGE_TEMPLATE.format(
         resume_template_js=resume_template_js,
         work_history_js=work_history_js,
     )
     RESUME_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    RESUME_OUTPUT_FILE.write_text(html)
+    RESUME_OUTPUT_FILE.write_text(page)
     print(f"Generated {RESUME_OUTPUT_FILE}")
 
 
