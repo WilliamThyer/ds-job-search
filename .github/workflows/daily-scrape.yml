@@ -57,7 +57,7 @@ jobs:
           username: ${{ secrets.GMAIL_ADDRESS }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: "${{ steps.scrape.outputs.new_jobs }} new Barcelona DS jobs found"
-          to: thyerwilliam@gmail.com
+          to: willst4321@gmail.com
           from: Barcelona Job Tracker
           body: |
             Found ${{ steps.scrape.outputs.new_jobs }} new data science jobs in Barcelona!
